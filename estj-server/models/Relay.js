@@ -5,7 +5,7 @@ const Schema   = mongoose.Schema
 const RelaySchema = new Schema(
     {
         name:     {type: String, required: true},
-        athletes: [Athlete]
+        athletes: {type: Array, required: true}
     }
 )
 

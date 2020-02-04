@@ -6,8 +6,32 @@ const HeatSchema = new Schema(
     {
         number:   {type: Number, required: true},
         event_id: {type: String, required: true},
-        entries:  [Entry]
+        entries:  {type: Array,  required: true}
     }
 )
+
+HeatSchema.pre('findOneAndUpdate', function(next) {
+    let options = this.getOptions()
+    let update = this.getUpdate()
+    if(options.upsert === true  &&  options.runValidators === true) {
+        HeatSchema.requiredPaths().map(p => {
+            if (typeof update[p] === 'undefined') {
+                let str = `field '${p}' is required for the Event Schema.`
+                return next(new Error(str))
+            }
+        })
+        // NOTE:  there has to be a better way to do this!!!
+        const entries = update.entries
+        for (entry of entries) {
+            Entry.requiredPaths().map(p => {
+                if (typeof entry[p] === 'undefined') {
+                    let str = `field '${p}' is required for the Entry Schema.`
+                    return next(new Error(str))
+                }
+            })
+        }
+    }
+    next()
+})
 
 module.exports = mongoose.model('Heat', HeatSchema)

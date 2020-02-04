@@ -85,8 +85,6 @@ function checkCmdLineArgs(argv)
 async function runProgram(pgmOptions)
 {
     debug('Inside runProgram')
-
-    // meetFile --> save the data into the DB
     if (pgmOptions.meetFile) {
         const meetJson = JSON.parse(fs.readFileSync(pgmOptions.meetFile, 'utf8'))
         await meetDbo.saveToDB(meetJson)

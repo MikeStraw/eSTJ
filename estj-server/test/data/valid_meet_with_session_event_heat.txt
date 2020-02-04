@@ -1,0 +1,32 @@
+{
+    "date": "2020-01-02",
+    "name": "Westerville Test vs. Nobody",
+    "numLanes": 8,
+    "type": "HighSchool",
+    "sessions": [
+      {
+        "number": 1, "name": "JV and Varsity", "day": 1, "time": "06:00 pm",
+        "events": [
+            {
+              "desc": "Boys 100 Butterfly  - Varsity", "isRelay": false, "numLanes": 6, "number": 1,
+              "entries": [
+                {
+                  "athlete": {
+                    "age": "15",
+                    "fname": "Maximus",
+                    "lname": "Cramer",
+                    "schoolYear": "SO",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "1:12.49",
+                  "heat": 1,
+                  "lane": 2,
+                  "seed": "1:12.79",
+                  "team": "Warhawks"
+                }
+              ]
+            }
+        ]
+      }
+    ]
+} 

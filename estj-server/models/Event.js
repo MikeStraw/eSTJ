@@ -12,4 +12,18 @@ const EventSchema = new Schema(
     }
 )
 
+EventSchema.pre('findOneAndUpdate', function(next) {
+    let options = this.getOptions()
+    let update = this.getUpdate()
+    if(options.upsert === true  &&  options.runValidators === true) {
+        EventSchema.requiredPaths().map(p => {
+            if (typeof update[p] === 'undefined') {
+                let str = `field '${p}' is required for the EventSchema.`
+                return next(new Error(str))
+            }
+        })
+    }
+    next()
+})
+
 module.exports = mongoose.model('Event', EventSchema)
