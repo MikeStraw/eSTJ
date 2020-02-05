@@ -22,8 +22,9 @@ HeatSchema.pre('findOneAndUpdate', function(next) {
         })
         // NOTE:  there has to be a better way to do this!!!
         const entries = update.entries
+        const entryRequiredPaths = Entry.requiredPaths()
         for (entry of entries) {
-            Entry.requiredPaths().map(p => {
+            entryRequiredPaths.map(p => {
                 if (typeof entry[p] === 'undefined') {
                     let str = `field '${p}' is required for the Entry Schema.`
                     return next(new Error(str))

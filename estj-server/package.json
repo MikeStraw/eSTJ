@@ -1,0 +1,33 @@
+{
+  "name": "estj-server",
+  "version": "0.1.0",
+  "description": "Electronic Stroke and Turn Judge",
+  "main": "index.js",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "minimist": "^1.2.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
+    "mongoose": "^5.8.10"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.0",
+    "eslint": "^6.8.0",
+    "jest": "^25.1.0"
+  },
+  "scripts": {
+    "start": "cross-env NODE_ENV=development DEBUG=estj-server node index.js",
+    "test": "jest "
+  },
+  "keywords": [
+    "swimming",
+    "swim meet",
+    "officiating"
+  ],
+  "jest" : {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": ["/node_modules/"]
+  },
+  "author": "Mike Straw",
+  "license": "ISC"
+}

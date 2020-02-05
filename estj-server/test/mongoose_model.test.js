@@ -43,7 +43,7 @@ afterEach(async () => {
 
 describe('Mongo-Mongoose Model Tests', () => {
     it('should add meet, event and heat data for a valid meet file', async done => {
-        const json = readTestFile('valid_meet_with_session_event_heat.txt')
+        const json = readTestFile('valid_meet_with_session_event_heat.json')
         await meetDbo.saveToDB(json)
 
         const meet = await Meet.findOne(json)
@@ -62,7 +62,7 @@ describe('Mongo-Mongoose Model Tests', () => {
     })
 
     it('should reject a meet without the required meet data', async done => {
-        const meet = readTestFile('valid_meet_with_session_event_heat.txt')
+        const meet = readTestFile('valid_meet_with_session_event_heat.json')
         delete meet.numLanes
 
         expect.assertions(1)
@@ -76,7 +76,7 @@ describe('Mongo-Mongoose Model Tests', () => {
     })
 
     it('should reject a meet without the required session data', async done => {
-        const meet = readTestFile('valid_meet_with_session_event_heat.txt')
+        const meet = readTestFile('valid_meet_with_session_event_heat.json')
         const session = meet.sessions[0]
         delete session.day
 
@@ -92,7 +92,7 @@ describe('Mongo-Mongoose Model Tests', () => {
     })
 
     it('should reject an event without the required data', async done => {
-        const meet = readTestFile('valid_meet_with_session_event_heat.txt')
+        const meet = readTestFile('valid_meet_with_session_event_heat.json')
         const session = meet.sessions[0]
         const event = session.events[0]
         delete event.desc
@@ -110,7 +110,7 @@ describe('Mongo-Mongoose Model Tests', () => {
     })
 
     it('should reject a heat without the required data', async done => {
-        const meet = readTestFile('valid_meet_with_session_event_heat.txt')
+        const meet = readTestFile('valid_meet_with_session_event_heat.json')
         const session = meet.sessions[0]
         const event = session.events[0]
         const entry = event.entries[0]

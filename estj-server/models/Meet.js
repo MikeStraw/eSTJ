@@ -25,8 +25,9 @@ MeetSchema.pre('findOneAndUpdate', function(next) {
         })
         // NOTE:  there has to be a better way to do this!!!
         const sessions = update.sessions
+        const sessionRequiredPaths = Session.requiredPaths()
         for (session of sessions) {
-            Session.requiredPaths().map(p => {
+            sessionRequiredPaths.map(p => {
                 if (typeof session[p] === 'undefined') {
                     let str = `field '${p}' is required for the Session Schema.`
                     return next(new Error(str))

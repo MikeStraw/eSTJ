@@ -1,5 +1,5 @@
 # Swim Meet JSON files in the top directory
-*.json
+data/*.json
 
 # Logs
 logs
