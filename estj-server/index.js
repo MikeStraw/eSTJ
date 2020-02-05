@@ -1,8 +1,9 @@
-const argv     = require('minimist')(process.argv.slice(2))  //[0] = node.exe, [1] =.../index.js
-const debug    = require('debug')('estj-server')
-const fs       = require('fs')
-const meetDbo  = require('./services/SwimMeetDbo')
-const mongoose = require('mongoose')
+const apiServer = require('./apiServer')
+const argv      = require('minimist')(process.argv.slice(2))  //[0] = node.exe, [1] =.../index.js
+const debug     = require('debug')('estj-server')
+const fs        = require('fs')
+const meetDbo   = require('./services/SwimMeetDbo')
+const mongoose  = require('mongoose')
 
 /**
  * Runs the eSTJ server.
@@ -97,7 +98,7 @@ async function runProgram(pgmOptions)
 
     if (pgmOptions.runApiServer) {
         debug('running API server ...')
-        //server.startServer(null)
+        apiServer.startServer()
     }
 
     // we're finished if we aren't running express or watching the meet file

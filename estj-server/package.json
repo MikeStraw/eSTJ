@@ -5,6 +5,13 @@
   "main": "index.js",
   "dependencies": {
     "debug": "^4.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-jwt": "^3.6.0",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^8.0.6",
+    "koa2-cors": "^2.0.6",
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
@@ -24,9 +31,11 @@
     "swim meet",
     "officiating"
   ],
-  "jest" : {
+  "jest": {
     "testEnvironment": "node",
-    "coveragePathIgnorePatterns": ["/node_modules/"]
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "Mike Straw",
   "license": "ISC"
