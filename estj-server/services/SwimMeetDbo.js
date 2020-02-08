@@ -86,7 +86,7 @@ function makeHeatEntryFromEventEntry(eventEntry) {
  * Save the Event data to the Mongo DB.
  * @param {Object} eventJson - Saves the event into the mongo DB.  eventJson is modified by this method.
  * @param {String} meetId - The mongo ID of the meet.
- * @returns {Promise<model/Event>} - The promise resolves to the saved Event object from the DB.
+ * @returns {Promise<Document>} - The promise resolves to the saved mongoose Event document.
  */
 function saveEventData(eventJson, meetId)
 {
@@ -104,7 +104,7 @@ function saveEventData(eventJson, meetId)
 /**
  *
  * @param {Object} heatJson - The heat and it's entries
- * @returns {Promise<model/Heat>}
+ * @returns {Promise<Document>} - The promise resolves to the saved mongoose Heat document.
  */
 function saveHeatData(heatJson) {
     const queryObj   = {'event_id': heatJson.event_id, 'number': heatJson.number}
@@ -118,7 +118,7 @@ function saveHeatData(heatJson) {
  * Save the meet and session data of the swim meet JSON object to the Mongo DB.
  * @param {Object} meetJson - The JSON representation of the swim meet as produced by mm_to_json.
  * meetJson is modified by this method.
- * @returns {Promise<model/Meet>} - The promise resolves to the saved Meet object from the DB.
+ * @returns {Promise<Document>} - The promise resolves to the saved mongoose Meet document.
  */
 function saveMeetAndSessions(meetJson) {
     // TODO: get local time zone

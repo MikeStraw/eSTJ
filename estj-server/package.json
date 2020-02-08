@@ -11,6 +11,7 @@
     "koa-jwt": "^3.6.0",
     "koa-logger": "^3.2.1",
     "koa-router": "^8.0.6",
+    "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
@@ -20,7 +21,8 @@
   "devDependencies": {
     "cross-env": "^7.0.0",
     "eslint": "^6.8.0",
-    "jest": "^25.1.0"
+    "jest": "^25.1.0",
+    "supertest": "^4.0.2"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development DEBUG=estj-server node index.js",

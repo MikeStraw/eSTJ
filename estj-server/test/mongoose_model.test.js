@@ -1,43 +1,26 @@
-const mongoose = require('mongoose')
+const dbUtil   = require('./dbUtils')
 const Event    = require('../models/Event')
 const fs       = require('fs')
 const Heat     = require('../models/Heat')
 const Meet     = require('../models/Meet')
 const meetDbo  = require('../services/SwimMeetDbo')
 
-const databaseName = 'stj-test'
 
 function readTestFile(fileName)
 {
     return JSON.parse(fs.readFileSync(`./test/data/${fileName}`, 'utf8'))
 }
 
-// empty mongo collections
-async function removeAllCollections () {
-    const collections = Object.keys(mongoose.connection.collections)
-    for (const collectionName of collections) {
-        const collection = mongoose.connection.collections[collectionName]
-        await collection.deleteMany({})
-    }
-}
-
 beforeAll( async() => {
-    const connectOpts = {
-        useNewUrlParser: true,    // uses port number in DSN
-        useFindAndModify: false,  // findAndModify uses MongoDB's findAndModify
-        useUnifiedTopology: true
-    }
-    // Connect to a Mongo DB
-    const url = `mongodb://127.0.0.1/${databaseName}`
-    await mongoose.connect(url, connectOpts)
+    await dbUtil.connectToDB('stj-test')
 })
 
 afterAll(async () => {
-    await mongoose.connection.close()
+    await dbUtil.closeDb()
 })
 
 afterEach(async () => {
-    await removeAllCollections()
+    await dbUtil.removeCollectionData()
 })
 
 

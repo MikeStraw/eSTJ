@@ -1,5 +1,7 @@
 const debug  = require('debug')('estj-server')
+const jwtSvc = require('../services/jwt')
 const Router = require('koa-router')
+const User   = require('../models/User')
 
 const router = new Router()
 
@@ -12,18 +14,52 @@ router.get('/login', async (ctx) => {
     ctx.status = 301
 })
 
-router.post('/login', async (ctx) => {
-    let firstname = ctx.request.body.firstname
-    let lastname = ctx.request.body.lastname
-    let pin = ctx.request.body.pin
-    debug(`first=${firstname}, last=${lastname} and pin=${pin}`)
+/**
+ * Saves or updates the user in the Mongo DB.
+ * @param {String} firstName - Thd official's first name
+ * @param {String} lastName - The official's last name
+ * @returns {User} - the User object (POJO, not Mongoose Document)
+ */
+async function saveUserToDB(firstName, lastName)
+{
+    const now = new Date()
+    const queryObj = {'first': firstName, 'last': lastName}
 
-    if (firstname && lastname && pin) {
-        ctx.body = {message: `Hello ${firstname} ${lastname} from /login.`}
+    let user = await User.findOne(queryObj).exec()
+    if (user) {
+        debug(`Found user ${user.first} ${user.last}`)
+        user.lastLogin = now
+
+        const updateOpts = {'new': true, 'upsert': true, 'runValidators': true}
+        user = await User.findOneAndUpdate(queryObj, user, updateOpts).exec()
     }
     else {
+        const newUser = new User({'first': firstName, 'last': lastName, 'lastLogin': now} )
+        user = await newUser.save()
+    }
+    return user.toObject()       // toObject removes extra Mongoose stuff
+}
+
+router.post('/login', async (ctx) => {
+    const firstname = ctx.request.body.firstname ? ctx.request.body.firstname.trim() : ''
+    const lastname  = ctx.request.body.lastname ? ctx.request.body.lastname.trim() : ''
+    const pin       = ctx.request.body.pin ? ctx.request.body.pin.trim() : ''
+    const validPin  = '12345'                  // TODO:  use .env file for pin
+    debug(`first=${firstname}, last=${lastname} and pin=${pin}`)
+
+    if (pin !== validPin) {
         ctx.status = 401
         ctx.body = {error: 'Invalid login'}
+    }
+    else if (! (firstname && lastname)) {
+        ctx.status = 400
+        ctx.body = {error: 'Missing information'}
+    }
+    else {
+        const user = await saveUserToDB(firstname, lastname)
+        const token = jwtSvc.issueToken(user)
+        ctx.status = 201
+        ctx.body = {token: token}
     }
 })
 

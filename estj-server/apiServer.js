@@ -5,10 +5,12 @@ const logger      = require('koa-logger')
 const Koa         = require('koa')
 const routesApi   = require('./routes/api')
 const routesLogin = require('./routes/login')
+const staticPath  = require('koa-static')
 
 const app = new Koa()
 app.use(logger())
 app.use(cors())
+app.use(staticPath('./public'))
 app.use(BodyParser())
 
 // Define the last-chance error middleware
@@ -36,12 +38,22 @@ function normalizePort(val) {
     return false
 }
 
+
 module.exports = {
+    server: null,     // http server
+
     startServer: function(listenPort) {
         const defaultPort = '3000'
         const port = listenPort ? normalizePort(listenPort) : normalizePort(process.env.PORT || defaultPort)
         debug(`starting koa app, listening on port ${port}`)
 
-        app.listen(port)
+        this.server = app.listen(port)
+        return (this.server)
+    },
+    stopServer: function() {
+        console.log('stopping the KOA server ....')
+        if(this.server) {
+            this.server.close()
+        }
     }
 }
