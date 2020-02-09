@@ -10,10 +10,12 @@ yarn-error.log*
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+estj-client/public
 
 # Dependency directories
 node_modules/
 jspm_packages/
+.DS_Store
 
 # TypeScript v1 declaration files
 typings/
