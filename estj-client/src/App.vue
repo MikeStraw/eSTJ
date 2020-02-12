@@ -38,7 +38,7 @@
     </v-app-bar>
 
     <v-content>
-      <router-view></router-view>
+        <router-view></router-view>
     </v-content>
   </v-app>
 </template>
@@ -46,14 +46,13 @@
 <script>
 
 export default {
-  name: 'App',
+    name: 'App',
 
-  components: {
+    components: {
+    },
 
-  },
-
-  data: () => ({
+    data: () => ({
     //
-  })
+    })
 }
 </script>

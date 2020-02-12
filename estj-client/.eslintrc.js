@@ -13,9 +13,18 @@ module.exports = {
     ],
     rules: {
         indent: ["warn", 4],
-        "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
-        "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
+        'vue/script-indent': ['warn', 4, { 'baseIndent': 0 }],
+        "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+        "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
         "quotes": ["warn", "single"],
         "semi": ["warn", "never"]
-    }
+    },
+    "overrides": [
+        {
+            "files": ["*.vue"],
+            "rules": {
+                "indent": "off"
+            }
+        }
+    ]
 };
