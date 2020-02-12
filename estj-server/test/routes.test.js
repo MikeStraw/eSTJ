@@ -11,7 +11,6 @@ beforeAll(async () => {
     server = apiServer.startServer()     // TODO:  how to start apiServer with known pin????
 })
 
-
 afterAll( async () => {
     apiServer.stopServer()
     await dbUtil.closeDb()
@@ -21,8 +20,17 @@ afterEach(async () => {
     await dbUtil.removeCollectionData()
 })
 
+async function login()  {
+    console.log('Sending login request')
+    const response = await request(server).post('/login')
+        .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12345'})
+        .set('Accept', 'application/json')
 
-describe('basic route tests', () => {
+    return response.body.token
+}
+
+
+describe('basic public route tests', () => {
     it('submitting a valid login form should return a JWT token', async done => {
         const response = await request(server).post('/login')
             .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12345'})
@@ -60,6 +68,27 @@ describe('basic route tests', () => {
             .set('Accept', 'application/json')
 
         expect(response.status).toEqual(401)
+        done()
+    })
+})
+
+describe('basic API route tests', () => {
+    it('/api/meets should return 401 unauthorized without sending JWT token', async done => {
+        const response = await request(server).get('/api/meets')
+            .set('Accept', 'application/json')
+
+        expect(response.status).toEqual(401)
+        done()
+    })
+
+    it('/api/meets should an empty list of meets', async done => {
+        const token = await login()
+        const response = await request(server).get('/api/meets')
+            .set('Accept', 'application/json')
+            .set('Authorization', `Bearer ${token}`)
+
+        expect(response.status).toEqual(200)
+        expect(response.body.length).toBe(0)
         done()
     })
 })

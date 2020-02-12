@@ -74,13 +74,14 @@ export default {
                 method: 'post',
                 url: 'http://localhost:3000/login',
                 data: this.form
-            }
-            ).then( (response) => {
+            }).then( (response) => {
                 this.authenticating = false
                 const token = response.data.token
                 const user = tokenSvc.decodeToken(token)
                 console.log('got user from token: ', user)
 
+                tokenSvc.saveToken(token)
+                this.$store.dispatch('saveUser', user)
                 this.$router.push( {name: 'meets'} )
 
             }).catch( (error) => {
