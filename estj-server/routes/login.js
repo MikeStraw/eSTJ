@@ -5,10 +5,6 @@ const User   = require('../models/User')
 
 const router = new Router()
 
-router.get('/', async (ctx) => {
-    ctx.body = {message: 'Hello world from get.'}
-})
-
 router.get('/login', async (ctx) => {
     ctx.redirect('/')
     ctx.status = 301

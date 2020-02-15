@@ -26,6 +26,7 @@ app.use(async (ctx, next) => {
     }
 })
 
+app.use(staticPath('./public'))  // serve estj-client built index.html from /public
 app.use(routesLogin.routes()).use(routesLogin.allowedMethods())
 app.use(routesApi.routes()).use(routesApi.allowedMethods())
 

@@ -11,6 +11,7 @@ yarn-error.log*
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 estj-client/dist
+estj-server/public
 
 # Dependency directories
 node_modules/

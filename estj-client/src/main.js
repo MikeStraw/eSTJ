@@ -7,6 +7,10 @@ import Vue from 'vue'
 import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
+const initialState = JSON.parse(window.__INITIAL_STATE__)
+const initialUrl = window.location.href
+console.log(`server data: version=${initialState.version}, port=${initialState.serverPort}, url=${initialUrl}`)
+
 
 new Vue({
     router,
