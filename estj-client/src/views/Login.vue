@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import apiSvc from '../services/api'
 import tokenSvc from '../services/token'
 
 export default {
@@ -65,34 +65,30 @@ export default {
     computed: {
     },
     methods: {
-        login() {
+        async login() {
             console.log('login method called.')
             this.authenticating = true
-            axios.defaults.headers.common['Content-Type'] = 'application/json'
-
-            axios( {
-                method: 'post',
-                url: 'http://localhost:3000/login',
-                data: this.form
-            }).then( (response) => {
-                this.authenticating = false
-                const token = response.data.token
-                const user = tokenSvc.decodeToken(token)
-                console.log('got user from token: ', user)
-
-                tokenSvc.saveToken(token)
-                this.$store.dispatch('saveUser', user)
+            try {
+                const response = await apiSvc.login(this.form)
+                await this.$store.dispatch('login', response.data.token)
                 this.$router.push( {name: 'meets'} )
+            }
+            catch (error) {
+                if (error && error.response && error.response.data) {
+                    this.authError = error.response.data.error
+                    this.authErrorCode = error.response.status
 
-            }).catch( (error) => {
-                this.authenticating = false
-                this.authError = error.response.data.error
-                this.authErrorCode = error.response.status
-
-                if (this.authErrorCode === 401) {
-                    this.authError = 'Invalid Pin'
+                    if (this.authErrorCode === 401) {
+                        this.authError = 'Invalid Pin'
+                    }
                 }
-            })
+                else {
+                    this.authError = 'Unknown authentication error ...'
+                }
+            }
+            finally {
+                this.authenticating = false
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 import App from './App.vue'
+import apiSvc from './services/api'
 import tokenSvc from './services/token'
 import router from './router'
 import store from './store'
@@ -8,28 +9,23 @@ import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 const initialState = JSON.parse(window.__INITIAL_STATE__)
-const initialUrl = window.location.href
-console.log(`server data: version=${initialState.version}, port=${initialState.serverPort}, url=${initialUrl}`)
+initialState.hostUrl = window.location.href
 
+console.log('initial state: ', initialState)
+apiSvc.init( initialState )
 
 new Vue({
     router,
     store,
     created() {
-        // Check local storage for the user token.  If found
-        // "auto-login" user.
+        // Check local storage for the user token.  If found "auto-login" user.
         const token = tokenSvc.getToken()
         if (token) {
-            const user = tokenSvc.decodeToken(token)
-            if (user) {
-                console.log(`Found user ${user.first} ${user.last} in localstorage`)
-                this.$store.dispatch('saveUser', user)
-            }
-            else {
-                // token is not valid, remove it
-                tokenSvc.removeToken()
-                this.$store.dispatch('removeUser')  // TODO:  implement logout action
-            }
+            console.log('Found auth token in localstorage, attempting auto-login')
+            this.$store.dispatch('login', token)
+                .catch( () => {
+                    this.$store.dispatch('logout')
+                })
         }
     },
     vuetify,
