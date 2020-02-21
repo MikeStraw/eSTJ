@@ -1,3 +1,4 @@
+const envResult = require('dotenv').config()
 const apiServer = require('./apiServer')
 const argv      = require('minimist')(process.argv.slice(2))  //[0] = node.exe, [1] =.../index.js
 const debug     = require('debug')('estj-server')
@@ -22,7 +23,12 @@ function main()
             reject(pgmOptions.errors)
         }
 
+        if (envResult.error) {
+            debug(`Warning:  error found in the .env file: ${envResult.error}`)
+        }
         process.on('unhandledRejection', error => { reject(error) })
+
+
 
         const connectOpts = {
             useNewUrlParser: true,    // uses port number in DSN
@@ -98,7 +104,7 @@ async function runProgram(pgmOptions)
 
     if (pgmOptions.runApiServer) {
         debug('running API server ...')
-        apiServer.startServer()
+        apiServer.startServer(process.env.API_PORT)
     }
 
     // we're finished if we aren't running express or watching the meet file

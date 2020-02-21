@@ -1,14 +1,16 @@
 //routes.test.js
 const apiServer = require('../apiServer')
 const dbUtil    = require('./dbUtils')
+const meetDbo   = require('../services/SwimMeetDbo')
 const request   = require('supertest')
+const testUtils = require('./testUtils')
 const User      = require('../models/User')
 
 let server
 
 beforeAll(async () => {
     await dbUtil.connectToDB('stj-test')
-    server = apiServer.startServer()     // TODO:  how to start apiServer with known pin????
+    server = apiServer.startServer()
 })
 
 afterAll( async () => {
@@ -23,17 +25,16 @@ afterEach(async () => {
 async function login()  {
     console.log('Sending login request')
     const response = await request(server).post('/login')
-        .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12345'})
+        .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12123'})
         .set('Accept', 'application/json')
 
     return response.body.token
 }
 
-
 describe('basic public route tests', () => {
     it('submitting a valid login form should return a JWT token', async done => {
         const response = await request(server).post('/login')
-            .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12345'})
+            .send({firstname: 'Buggs', lastname: 'Bunny', pin: '12123'})
             .set('Accept', 'application/json')
 
         expect(response.status).toEqual(201)
@@ -44,7 +45,7 @@ describe('basic public route tests', () => {
         const firstname = 'Buggs'
         const lastname  = 'Bunny'
         const response = await request(server).post('/login')
-            .send({firstname: firstname, lastname: lastname, pin: '12345'})
+            .send({firstname: firstname, lastname: lastname, pin: '12123'})
             .set('Accept', 'application/json')
         expect(response.status).toEqual(201)
 
@@ -56,7 +57,7 @@ describe('basic public route tests', () => {
     })
     it('submitting an incomplete login form should return a client error code', async done => {
         const response = await request(server).post('/login')
-            .send({firstname: 'Buggs',  pin: '12345'})
+            .send({firstname: 'Buggs',  pin: '12123'})
             .set('Accept', 'application/json')
 
         expect(response.status).toEqual(400)
@@ -81,7 +82,7 @@ describe('basic API route tests', () => {
         done()
     })
 
-    it('/api/meets should an empty list of meets', async done => {
+    it('/api/meets should return an empty list of meets when no meets are in the DB', async done => {
         const token = await login()
         const response = await request(server).get('/api/meets')
             .set('Accept', 'application/json')
@@ -89,6 +90,20 @@ describe('basic API route tests', () => {
 
         expect(response.status).toEqual(200)
         expect(response.body.length).toBe(0)
+        done()
+    })
+
+    it('/api/meets should return a list of meets when there are meets in the DB', async done => {
+        const json = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
+        await meetDbo.saveToDB(json)
+
+        const token = await login()
+        const response = await request(server).get('/api/meets')
+            .set('Accept', 'application/json')
+            .set('Authorization', `Bearer ${token}`)
+
+        expect(response.status).toEqual(200)
+        expect(response.body.length).toBe(1)
         done()
     })
 })

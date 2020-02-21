@@ -1,4 +1,4 @@
-import apiSvc from "../services/api"
+import apiSvc from '../services/api'
 import tokenSvc from '../services/token'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -29,10 +29,10 @@ const store = new Vuex.Store({
                 throw new Error('Invalid auth token received')
             }
         },
-        logout( {commit, dispatch} ) {
+        logout( ) {
             tokenSvc.removeToken()
             console.log(`User ${this.state.user.first} ${this.state.user.last} logging out.`)
-            commit('setUser', false)
+            location.reload() // reload from the server starts vuex fresh
         }
     },
     getters: {

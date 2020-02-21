@@ -4,7 +4,7 @@ const jwt = require('koa-jwt')
 const OPT_ALGORITHM = 'HS256'
 const OPT_EXPIRES = '3h'
 const OPT_ISSUER  = 'eSTJ-Server'
-const SECRET = 'stj-server-blah-blah-blah'  // TODO:  use .env file
+const SECRET = process.env.JWT_SECRET ? process.env.JWT_SECRET : 'stj-server-blah-blah-blah'
 
 const jwtOptions =  {'secret': SECRET, 'expiresIn': OPT_EXPIRES}
 const jwtInstance = jwt(jwtOptions)

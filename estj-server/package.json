@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=development DEBUG=estj-server node index.js",
-    "test": "jest "
+    "test": "jest --setupFiles dotenv/config"
   },
   "keywords": [
     "swimming",

@@ -4,6 +4,7 @@ const Router = require('koa-router')
 const User   = require('../models/User')
 
 const router = new Router()
+const validPin = process.env.LOGIN_PIN ? process.env.LOGIN_PIN : '12345'
 
 router.get('/login', async (ctx) => {
     ctx.redirect('/')
@@ -40,7 +41,6 @@ router.post('/login', async (ctx) => {
     const firstname = ctx.request.body.firstname ? ctx.request.body.firstname.trim() : ''
     const lastname  = ctx.request.body.lastname ? ctx.request.body.lastname.trim() : ''
     const pin       = ctx.request.body.pin ? ctx.request.body.pin.trim() : ''
-    const validPin  = '12345'                  // TODO:  use .env file for pin
     debug(`first=${firstname}, last=${lastname} and pin=${pin}`)
 
     if (pin !== validPin) {
