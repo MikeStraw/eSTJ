@@ -26,11 +26,15 @@ export default {
     name: 'toolbarHeader',
     data: () => ({
     }),
-    computed: mapState( ['user'] ),
+    computed: {
+        ...mapState('auth', {
+            user: state => state.user
+        })
+    },
     methods: {
         logout() {
             console.log('stjHeader ... logout called.')
-            this.$store.dispatch('logout')
+            this.$store.dispatch('auth/logout')
                 .then( () => {
                     this.$router.push( {name: 'login'} )
                 })

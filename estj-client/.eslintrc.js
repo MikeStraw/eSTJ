@@ -1,30 +1,29 @@
 module.exports = {
     root: true,
     env: {
-        "es6": true,
-        node: true
+        node: true,
     },
-    "parserOptions": {
-        "ecmaVersion": 2017,
-        "sourceType": "module"
+    extends: ['plugin:vue/essential', 'eslint:recommended'],
+    parserOptions: {
+        parser: 'babel-eslint',
     },
-    extends: [
-        'plugin:vue/base'
-    ],
     rules: {
-        indent: ["warn", 4],
-        'vue/script-indent': ['warn', 4, { 'baseIndent': 0 }],
-        "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-        "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-        "quotes": ["warn", "single"],
-        "semi": ["warn", "never"]
+        'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+        'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+        indent: ['warn', 4],
+        'vue/script-indent': ['warn', 4, { baseIndent: 0 }],
+        quotes: ['warn', 'single'],
+        semi: ['warn', 'never'],
     },
-    "overrides": [
+    overrides: [
         {
-            "files": ["*.vue"],
-            "rules": {
-                "indent": "off"
-            }
-        }
-    ]
-};
+            files: [
+                '**/__tests__/*.{j,t}s?(x)',
+                '**/tests/unit/**/*.spec.{j,t}s?(x)',
+            ],
+            env: {
+                jest: true,
+            },
+        },
+    ],
+}

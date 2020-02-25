@@ -1,11 +1,11 @@
 <template>
     <v-app class="indigo lighten-5">>
-      <stj-header></stj-header>
+        <stj-header></stj-header>
 
-      <v-content>
-          <router-view></router-view>
-      </v-content>
-  </v-app>
+        <v-content>
+            <router-view></router-view>
+        </v-content>
+    </v-app>
 </template>
 
 <script>

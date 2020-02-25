@@ -44,7 +44,6 @@
 
 <script>
 import apiSvc from '../services/api'
-import tokenSvc from '../services/token'
 
 export default {
     name: 'Meets',
@@ -98,7 +97,7 @@ export default {
         },
         logout() {
             console.log('logout clicked')
-            this.$store.dispatch('logout')
+            this.$store.dispatch('auth/logout')
                 .then( () => {
                     this.$router.push( {name: 'login'} )
                 })

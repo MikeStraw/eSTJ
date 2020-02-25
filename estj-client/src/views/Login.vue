@@ -43,16 +43,12 @@
 </template>
 
 <script>
-import apiSvc from '../services/api'
-import tokenSvc from '../services/token'
+import {mapState} from 'vuex'
 
 export default {
     name: 'login',
     data() {
         return {
-            authenticating: false,
-            authError: '',
-            authErrorCode: '',
             form: {
                 firstname: '',
                 lastname: '',
@@ -62,32 +58,23 @@ export default {
             formValid: false      // true if all required fields are filled in
         }
     },
+    //computed: mapState( ['authenticating', 'authError', 'authErrorCode']),
     computed: {
+        ...mapState('auth', {
+            authenticating: state => state.authenticating,
+            authError:      state => state.authError,
+            authErrorCode:  state => state.authErrorCode
+        })
     },
     methods: {
         async login() {
             console.log('login method called.')
-            this.authenticating = true
             try {
-                const response = await apiSvc.login(this.form)
-                await this.$store.dispatch('login', response.data.token)
-                this.$router.push( {name: 'meets'} )
+                await this.$store.dispatch('auth/login', this.form)
+                await this.$router.push( {name: 'meets'} )
             }
-            catch (error) {
-                if (error && error.response && error.response.data) {
-                    this.authError = error.response.data.error
-                    this.authErrorCode = error.response.status
-
-                    if (this.authErrorCode === 401) {
-                        this.authError = 'Invalid Pin'
-                    }
-                }
-                else {
-                    this.authError = 'Unknown authentication error ...'
-                }
-            }
-            finally {
-                this.authenticating = false
+            catch (err) {
+                console.log(`Login.vue:  caught error ${err ? err : ''}`)
             }
         }
     }
