@@ -33,12 +33,6 @@
                 </v-card>
             </v-col>
         </v-row>
-
-        <v-row>
-            <v-col>
-                <v-btn @click="logout">Log Out</v-btn>
-            </v-col>
-        </v-row>
     </v-container>
 </template>
 
@@ -94,14 +88,6 @@ export default {
             finally {
                 this.loading = false
             }
-        },
-        logout() {
-            console.log('logout clicked')
-            this.$store.dispatch('auth/logout')
-                .then( () => {
-                    this.$router.push( {name: 'login'} )
-                })
-
         }
     },
     created() {

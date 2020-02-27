@@ -1,9 +1,5 @@
 import apiSvc from '../../services/api'
 import tokenSvc from '../../services/token'
-import Vue from 'vue'
-import Vuex from 'vuex'
-
-Vue.use(Vuex)
 
 async function submitLogin(userData)
 {
