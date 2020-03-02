@@ -23,7 +23,7 @@ new Vue({
             const user = tokenSvc.decodeToken(token)
             if (user) {
                 apiSvc.addAuthHeader(token)
-                this.$store.dispatch('setUser', user).then( () => {
+                this.$store.dispatch('auth/setUser', user).then( () => {
                     console.log('Auto-Login: successful Login')
                 })
             }

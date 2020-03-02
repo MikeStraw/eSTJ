@@ -1,3 +1,4 @@
+import EventsView from './views/Events'
 import LoginView from './views/Login'
 import MeetsView from './views/Meets'
 import NotFound from './views/NotFound'
@@ -20,6 +21,11 @@ const router = new Router({
             name: 'login',
             component: LoginView,
             meta: { public: true }
+        },
+        {
+            path: '/meet/:id/session/:num/events',
+            name: 'events',
+            component: EventsView
         },
         {
             path: '/meets',

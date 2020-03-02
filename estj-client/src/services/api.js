@@ -58,6 +58,11 @@ const ApiService = {
         console.log(`apiSvc:init - baseUrl=${baseUrl}`)
     },
 
+    getEvents: (meetId, sessNum) => {
+        const path = `meet/${meetId}/session/${sessNum}/events`
+        return axios.get(getUrl(path, true))
+    },
+
     getMeets: () => { return axios.get(getUrl('meets', true)) },
 
     login: (data) => { return axios.post(getUrl('login', false), data) }

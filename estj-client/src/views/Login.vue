@@ -58,7 +58,6 @@ export default {
             formValid: false      // true if all required fields are filled in
         }
     },
-    //computed: mapState( ['authenticating', 'authError', 'authErrorCode']),
     computed: {
         ...mapState('auth', {
             authenticating: state => state.authenticating,

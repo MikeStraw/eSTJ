@@ -1,11 +1,11 @@
 module.exports = {
     root: true,
     env: {
-        node: true,
+        node: true
     },
     extends: ['plugin:vue/essential', 'eslint:recommended'],
     parserOptions: {
-        parser: 'babel-eslint',
+        parser: 'babel-eslint'
     },
     rules: {
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
@@ -13,16 +13,16 @@ module.exports = {
         indent: ['warn', 4],
         'vue/script-indent': ['warn', 4, { baseIndent: 0 }],
         quotes: ['warn', 'single'],
-        semi: ['warn', 'never'],
+        semi: ['warn', 'never']
     },
     overrides: [
         {
             files: [
                 '**/__tests__/*.{j,t}s?(x)',
-                '**/tests/unit/**/*.spec.{j,t}s?(x)',
+                '**/tests/unit/**/*.spec.{j,t}s?(x)'
             ],
             env: {
-                jest: true,
+                jest: true
             },
         },
     ],

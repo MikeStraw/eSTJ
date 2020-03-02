@@ -26,7 +26,7 @@
                         <v-data-table
                                 :headers="headers"
                                 :items="meet.sessions"
-                                @click:row="handleClick"
+                                @click:row="handleClick(meet)"
                                 hide-default-footer
                         ></v-data-table>
                     </v-card-text>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import apiSvc from '../services/api'
+import {mapState} from 'vuex'
 
 export default {
     name: 'Meets',
@@ -48,11 +48,15 @@ export default {
                 {text: 'Session Name', value: 'name', sortable: false},
                 {text: 'Day', value: 'day', sortable: false},
                 {text: 'Time', value: 'time', sortable: false}
-            ],
-            loading: true,
-            loadingError: '',
-            meets: []
+            ]
         }
+    },
+    computed: {
+        ...mapState('meet', {
+            loading:      state => state.loading,
+            loadingError: state => state.loadingError,
+            meets:        state => state.meets
+        })
     },
     filters: {
         // strip the time and timezone info from timestamp string
@@ -63,35 +67,18 @@ export default {
 
     },
     methods: {
-        findMeetBySessionId(sessId) {
-            for (let meet of this.meets) {
-                let sessFound = meet.sessions.find( ({ _id }) => {return (_id  === sessId) } )
-                if (sessFound) {
-                    return meet
-                }
-            }
-            return null
-        },
-        handleClick(session) {
-            const meet = this.findMeetBySessionId(session._id)
-            console.log(`found meet ${meet.name} and session number ${session.number}`)
+        handleClick(meet) {
+            const sessIdx = event.target.parentNode.rowIndex
+            const session = meet.sessions[sessIdx - 1]
+            console.log(`found meet ${meet.name} and session number ${session.number}, pushing to events view`)
+            this.$router.push( {name: 'events', params: {id: meet._id, num: session.number}} )
         },
         async loadMeets() {
-            try {
-                const response = await apiSvc.getMeets()
-                this.meets = response.data
-                console.log(`/api/meets returns with meets.length = ${this.meets.length}`)
-            }
-            catch(error) {
-                this.loadingError = error.response.data.error
-            }
-            finally {
-                this.loading = false
-            }
+            console.log('Meets.vue: dispatching meet/loadMeets')
+            await this.$store.dispatch('meet/loadMeets')
         }
     },
     created() {
-        console.log('created ... need to load the meets')
         this.loadMeets()
     }
 }
