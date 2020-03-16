@@ -1,3 +1,4 @@
+import EventView from './views/Event'
 import EventsView from './views/Events'
 import LoginView from './views/Login'
 import MeetsView from './views/Meets'
@@ -21,6 +22,12 @@ const router = new Router({
             name: 'login',
             component: LoginView,
             meta: { public: true }
+        },
+        {
+            path: '/event/:id/heats',
+            name: 'event',
+            props: true,
+            component: EventView
         },
         {
             path: '/meet/:id/session/:num/events',

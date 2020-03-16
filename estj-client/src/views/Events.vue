@@ -62,9 +62,7 @@ export default {
         },
         selectEvent(event){
             console.log(`selected event ... num=${event.number}, id=${event._id}`)
-            // if (this.$store.dispatch('meet/setActiveEvent', event)) {
-            //     this.$router.push({ name: 'event', params: {eventId: event._id} })
-            // }
+            this.$router.push({ name: 'event', params: {event: event} })
         }
     },
     created() {
@@ -77,5 +75,7 @@ export default {
 </script>
 
 <style scoped>
-
+    tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, .05);
+    }
 </style>

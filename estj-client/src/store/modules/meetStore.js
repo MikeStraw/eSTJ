@@ -40,9 +40,16 @@ const state = {
 }
 
 const getters = {
-    // getMeetBySessionId: (state) => (sessId) => {
-    //     return findMeetBySessionId(state.meets, sessId)
-    // },
+    getEntriesByHeat: (state) => (heatNum) => {
+        console.log(`meetStore::getEntriesByHeat heat #${heatNum}`)
+        if (state.activeEvent.heats && state.activeEvent.heats.length >= heatNum) {
+            return state.activeEvent.heats[heatNum - 1].entries
+        }
+        else {
+            return []
+        }
+    },
+    numLanes: state => { return state.activeEvent.numLanes ? state.activeEvent.numLanes : 8 }
 }
 
 const mutations = {
@@ -56,6 +63,9 @@ const mutations = {
     dataRequestFinished(state) {
         state.loading = false
     },
+    setActiveEvent(state, event) {
+        state.activeEvent = event
+    },
     setActiveMeet(state, meet) {
         state.activeMeet = meet
     },
@@ -65,6 +75,31 @@ const mutations = {
 }
 
 const actions = {
+    async loadEvent( {commit}, payload) {
+        let   heats = []
+        const event = payload.event
+        console.log('loadEvent, payload: ', event)
+        commit('dataRequested')
+        try {
+            const response = await apiSvc.getHeats(event._id)
+            heats = response.data
+            console.log(`/api/event/heats returns with heats.length = ${heats.length}`)
+
+            // TODO:  We really want to save the event and heat data in a cache.
+            //        For now just save a copy in activeEvent
+            const eventCopy = JSON.parse(JSON.stringify(event))
+            eventCopy.heats = heats
+            commit('setActiveEvent', eventCopy)
+        }
+        catch(error) {
+            commitError(commit, error)
+        }
+        finally {
+            commit('dataRequestFinished')
+        }
+        return (heats)
+    },
+
     async loadEvents( {commit, state}, payload) {
         commit('dataRequested')
         try {

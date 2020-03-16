@@ -26,7 +26,7 @@
                         <v-data-table
                                 :headers="headers"
                                 :items="meet.sessions"
-                                @click:row="handleClick(meet)"
+                                @click:row="selectMeet(meet)"
                                 hide-default-footer
                         ></v-data-table>
                     </v-card-text>
@@ -67,15 +67,15 @@ export default {
 
     },
     methods: {
-        handleClick(meet) {
+        async loadMeets() {
+            console.log('Meets.vue: dispatching meet/loadMeets')
+            await this.$store.dispatch('meet/loadMeets')
+        },
+        selectMeet(meet) {
             const sessIdx = event.target.parentNode.rowIndex
             const session = meet.sessions[sessIdx - 1]
             console.log(`found meet ${meet.name} and session number ${session.number}, pushing to events view`)
             this.$router.push( {name: 'events', params: {id: meet._id, num: session.number}} )
-        },
-        async loadMeets() {
-            console.log('Meets.vue: dispatching meet/loadMeets')
-            await this.$store.dispatch('meet/loadMeets')
         }
     },
     created() {

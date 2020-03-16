@@ -63,6 +63,12 @@ const ApiService = {
         return axios.get(getUrl(path, true))
     },
 
+    getHeats: (eventId) => {
+        const path = `event/${eventId}/heats`
+        console.log(`getHeats: path=${path}`)
+        return axios.get(getUrl(path, true))
+    },
+
     getMeets: () => { return axios.get(getUrl('meets', true)) },
 
     login: (data) => { return axios.post(getUrl('login', false), data) }

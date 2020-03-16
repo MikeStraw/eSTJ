@@ -1,4 +1,5 @@
-// const debug  = require('debug')('estj-server')
+const debug  = require('debug')('estj-server')
+const Heat   = require('../models/Heat')
 const Event  = require('../models/Event')
 const jwt    = require('../services/jwt')
 const Meet   = require('../models/Meet')
@@ -10,6 +11,21 @@ const router = new Router()
 // If token is valid, ctx.state.user contains the decoded JSON token object.
 // Otherwise a 401 - Not Authorized response is returned.
 router.use(jwt.errorHandler()).use(jwt.jwt())
+
+router.get('/api/event/:eventId/heats', async (ctx) => {
+    const eventId = ctx.params.eventId
+    debug(`/api/:eventId/heats called with eventID=${eventId}`)
+
+    if (! eventId) {
+        debug('apiRouter.getHeats: No event-id ...')
+        ctx.status = 400
+        ctx.body= json({ message: 'Required parameter eventId missing.' })
+    }
+    else {
+        const heats = await Heat.find({'event_id': eventId})
+        ctx.body = heats
+    }
+})
 
 router.get('/api/meets', async (ctx) => {
     ctx.body = await Meet.find( {} )
