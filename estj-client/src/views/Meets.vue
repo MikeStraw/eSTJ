@@ -48,14 +48,14 @@ export default {
                 {text: 'Session Name', value: 'name', sortable: false},
                 {text: 'Day', value: 'day', sortable: false},
                 {text: 'Time', value: 'time', sortable: false}
-            ]
+            ],
+            meets: []
         }
     },
     computed: {
         ...mapState('meet', {
             loading:      state => state.loading,
             loadingError: state => state.loadingError,
-            meets:        state => state.meets
         })
     },
     filters: {
@@ -69,7 +69,8 @@ export default {
     methods: {
         async loadMeets() {
             console.log('Meets.vue: dispatching meet/loadMeets')
-            await this.$store.dispatch('meet/loadMeets')
+            this.$store.dispatch('meet/loadMeets')
+                .then( (meetList) => {this.meets = meetList})
         },
         selectMeet(meet) {
             const sessIdx = event.target.parentNode.rowIndex

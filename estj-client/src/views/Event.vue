@@ -19,14 +19,18 @@
             </v-col>
         </v-row>
 
-        <relayHeat v-if="event.isRelay" :event="event" :heat="heat" :numLanes="numLanes"></relayHeat>
-        <heat v-else :event="event" :heat="heat" :numLanes="numLanes"></heat>
+        <relayHeat v-if="event.isRelay" :event="event" :heat="heat" :numLanes="numberOfLanes"></relayHeat>
+        <heat v-else :event="event" :heat="heat" :numLanes="numberOfLanes"></heat>
 
         <v-row justify="space-between" class="mt-5">
             <v-btn @click="prevHeat" text>
                 <v-icon left>mdi-arrow-left</v-icon>Prev Heat
             </v-btn>
-            <v-btn text>Go To Event</v-btn>
+
+            <v-btn @click="gotoEventList" text><v-icon>mdi-list</v-icon>Event List</v-btn>
+
+            <v-btn @click="refresh" text><v-icon left>mdi-refresh</v-icon>Refresh</v-btn>
+
             <v-btn @click="nextHeat" text>
                 Next Heat<v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
@@ -37,7 +41,6 @@
 <script>
 import heat from '../components/heat'
 import relayHeat from '../components/relayHeat'
-import { mapGetters } from 'vuex'
 import { mapState } from 'vuex'
 export default {
     name: 'Event',
@@ -52,12 +55,8 @@ export default {
     },
     computed: {
         numberOfHeats: function() {return  this.heats ? this.heats.length : 0},
-        ...mapGetters({
-            // getEntriesByHeat: 'meet/getEntriesByHeat', // NEEDED???
-            numLanes:         'meet/numLanes'
-        }),
+        numberOfLanes: function() {return this.event.numLanes ? this.event.numLanes : 0},
         ...mapState({
-            // heats:        state => state.meet.activeEvent.heats,
             loading:      state => state.meet.loading,
             loadingError: state => state.meet.loadingError,
             meet:         state => state.meet.activeMeet
@@ -66,6 +65,10 @@ export default {
     filters: {
     },
     methods: {
+        gotoEventList() {
+            console.log(`gotoEventList: meet-id=${this.meet._id}, sessNum=${this.meet.session.number}`)
+            this.$router.push( {name: 'events', params: {id: this.meet._id, num: this.meet.session.number}} )
+        },
         async loadEvent() {
             console.log('Event.vue: dispatching meet/loadEvent')
             this.$store.dispatch('meet/loadEvent', {event: this.event})
@@ -78,15 +81,16 @@ export default {
                 })
         },
         nextHeat() {
+            console.log('nextHeat clicked')
         },
         prevHeat() {
+            console.log('prevHeat clicked')
+        },
+        refresh() {
+            console.log('refresh clicked')
         }
     },
     created() {
-        const event = this.$route.params.event
-        if (event) console.log('created ... load event, ', event)
-        else   console.log('created ... load event, no params.event')
-
         this.loadEvent()
     }
 }
