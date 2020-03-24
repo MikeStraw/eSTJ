@@ -71,6 +71,38 @@ const mutations = {
 
 const actions = {
     /**
+     * Return the next event in the active event
+     * @param state
+     * @returns {null} - The next event or null if there is no next event
+     */
+    getNextEvent({state}) {
+        const activeMeet = state.activeMeet
+        let nextEvent = null
+
+        if (activeMeet && activeMeet.events && activeMeet.events.length > 0) {
+            if (activeMeet.eventIdx !== activeMeet.events.length - 1) {
+                nextEvent = activeMeet.events[activeMeet.eventIdx + 1]
+            }
+        }
+        return nextEvent
+    },
+    /**
+     * Return the previous event in the active event
+     * @param state
+     * @returns {null}
+     */
+    getPrevEvent({state}) {
+        const activeMeet = state.activeMeet
+        let prevEvent = null
+
+        if (activeMeet && activeMeet.events && activeMeet.events.length > 0) {
+            if (activeMeet.eventIdx !== 0) {
+                prevEvent = activeMeet.events[activeMeet.eventIdx - 1]
+            }
+        }
+        return prevEvent
+    },
+    /**
      * Load the Event entries (ie heats) for the event identified by the payload
      * @param commit
      * @param payload - and event object with an _id field

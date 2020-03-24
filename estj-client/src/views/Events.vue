@@ -62,7 +62,7 @@ export default {
         },
         selectEvent(event){
             console.log(`selected event ... num=${event.number}, id=${event._id}`)
-            this.$router.push({ name: 'event', params: {event: event} })
+            this.$router.push({ name: 'event', params: {id: event._id, event: event} })
         }
     },
     created() {

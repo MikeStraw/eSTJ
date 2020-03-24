@@ -23,16 +23,22 @@
         <heat v-else :event="event" :heat="heat" :numLanes="numberOfLanes"></heat>
 
         <v-row justify="space-between" class="mt-5">
-            <v-btn @click="prevHeat" text>
-                <v-icon left>mdi-arrow-left</v-icon>Prev Heat
+            <v-btn v-if="hasPrevHeat" @click="gotoPreviousHeat" text>
+                <v-icon left>mdi-arrow-left</v-icon>Previous Heat
+            </v-btn>
+            <v-btn v-else @click="gotoPreviousEvent" text>
+                <v-icon left>mdi-arrow-left</v-icon>Previous Event
             </v-btn>
 
             <v-btn @click="gotoEventList" text><v-icon>mdi-list</v-icon>Event List</v-btn>
 
             <v-btn @click="refresh" text><v-icon left>mdi-refresh</v-icon>Refresh</v-btn>
 
-            <v-btn @click="nextHeat" text>
-                Next Heat<v-icon right>mdi-arrow-right</v-icon>
+            <v-btn v-if="hasNextHeat" @click="gotoNextHeat" text>Next Heat
+                <v-icon right>mdi-arrow-right</v-icon>
+            </v-btn>
+            <v-btn v-else @click="gotoNextEvent" text>Next Event
+                <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
         </v-row>
     </v-container>
@@ -54,8 +60,10 @@ export default {
         }
     },
     computed: {
-        numberOfHeats: function() {return  this.heats ? this.heats.length : 0},
-        numberOfLanes: function() {return this.event.numLanes ? this.event.numLanes : 0},
+        hasNextHeat:   function() { return this.heatIdx < (this.heats.length - 1) },
+        hasPrevHeat:   function() { return this.heatIdx > 0 },
+        numberOfHeats: function() { return  this.heats.length },
+        numberOfLanes: function() { return this.event.numLanes ? this.event.numLanes : 0 },
         ...mapState({
             loading:      state => state.meet.loading,
             loadingError: state => state.meet.loadingError,
@@ -69,6 +77,37 @@ export default {
             console.log(`gotoEventList: meet-id=${this.meet._id}, sessNum=${this.meet.session.number}`)
             this.$router.push( {name: 'events', params: {id: this.meet._id, num: this.meet.session.number}} )
         },
+        gotoNextEvent() {
+            console.log('need to go to next event ...')
+            this.$store.dispatch('meet/getNextEvent').then ( (nextEvent) => {
+                if (nextEvent) {
+                    this.$router.push({ name: 'event', params: {id: nextEvent._id, event: nextEvent} })
+                }
+                else {
+                    this.gotoEventList()
+                }
+            })
+
+        },
+        gotoNextHeat() {
+            this.heatIdx++
+            this.heat = this.heats[this.heatIdx]
+        },
+        gotoPreviousEvent() {
+            console.log('need to go to previous event ...')
+            this.$store.dispatch('meet/getPrevEvent').then ( (prevEvent) => {
+                if (prevEvent) {
+                    this.$router.push({ name: 'event', params: {id: prevEvent._id, event: prevEvent} })
+                }
+                else {
+                    this.gotoEventList()
+                }
+            })
+        },
+        gotoPreviousHeat() {
+            this.heatIdx--
+            this.heat = this.heats[this.heatIdx]
+        },
         async loadEvent() {
             console.log('Event.vue: dispatching meet/loadEvent')
             this.$store.dispatch('meet/loadEvent', {event: this.event})
@@ -80,18 +119,16 @@ export default {
                     }
                 })
         },
-        nextHeat() {
-            console.log('nextHeat clicked')
-        },
-        prevHeat() {
-            console.log('prevHeat clicked')
-        },
         refresh() {
             console.log('refresh clicked')
         }
     },
     created() {
+        console.log(`this.$route.params.id = ${this.$route.params.id}`)
         this.loadEvent()
+    },
+    watch: {
+        '$route': 'loadEvent'
     }
 }
 </script>
