@@ -13,7 +13,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr :class="isDqd(event.number, heat.number, index) ? 'custom-highlight-row' : '' "
+            <tr :class="isDqd(heat, index) ? 'custom-highlight-row' : '' "
                 v-for="index in numLanes"
                 :key="`lane=${index}`">
                 <td>{{ index }}</td>
@@ -24,7 +24,7 @@
                 <td class="text-right">{{ getFinalTime(index) }}</td>
                 <td>
                     <div v-if="isLaneOccupied(index)">
-                        <dq-cancel v-if="isDqd(event.number, heat.number, index)"
+                        <dq-cancel v-if="isDqd(heat, index)"
                                    @dq-cancel="onCancelDq" :event="event" :heat="heat" :lane="index"></dq-cancel>
                         <dq-dialog v-else
                                    @dq="onDq" :event="event" :heat="heat" :lane="index" />

@@ -1,24 +1,23 @@
-import dqSvc from '../services/dq'
+// Common functionality for heat.vue and relayHeat.vue
+
+import {mapGetters} from 'vuex'
 
 export default {
     data() {
         return {
-            dqLane: 0  // just needed for DQ reactivity
         }
+    },
+    computed: {
+        ...mapGetters({
+            isDqd: 'dq/isDqd'
+        })
     },
     methods: {
         addDq(dqData) {
-            this.dqLane++        // trigger reactivity
-            dqSvc.addDq(dqData)
+            this.$store.dispatch('dq/addDq', dqData)
         },
-        isDqd (event, heat, lane) {
-            // add dqLane as a fake parameter so that isDqd is triggered
-            // for all rows after a DQ is added or removed
-            return dqSvc.isDqd(event, heat, lane , this.dqLane)
-        },
-        removeDq (event, heat, lane) {
-            this.dqLane++         // trigger reactivity
-            dqSvc.removeDq(event, heat, lane)
+        removeDq (heat, lane) {
+            this.$store.dispatch('dq/removeDq', heat, lane)
         },
         isLaneOccupied(lane) {
             const entry = this.getEntryByLane(lane)
@@ -56,8 +55,7 @@ export default {
             return entry ? entry.team : ''
         },
         onCancelDq(dlgData) {
-            console.log(`Removing DQ from (${this.event.number}, ${this.heat.number}, ${dlgData.lane})`)
-            this.removeDq(this.event.number, this.heat.number, dlgData.lane)
+            this.removeDq(this.heat, dlgData.lane)
         },
         onDq(dlgData) {
             if (dlgData.status === 'submit') {
@@ -70,9 +68,5 @@ export default {
         }
     },
     created() {
-        // randomize dqLane so that switching from one event to another
-        // will trigger reactivity
-        this.dqLane = Math.floor(Math.random() * 1000)
-        console.log(`heatMixin: randomizing dqLane, value=${this.dqLane}`)
     }
 }

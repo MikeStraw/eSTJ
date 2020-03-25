@@ -92,7 +92,7 @@ export default {
             this.$emit('dq', {status: 'cancel', data: {}})
         },
         getDqData() {
-            const dqData = { event: this.event.number, heat: this.heat.number, lane: this.lane }
+            const dqData = { event: this.event.number, heat: this.heat, lane: this.lane }
             const reasonData = []
             for (let elem in this.form.reason) {
                 if (this.form.reason[elem]) reasonData.push(`${elem}`)
