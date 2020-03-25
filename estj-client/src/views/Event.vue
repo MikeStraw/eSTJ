@@ -19,8 +19,10 @@
             </v-col>
         </v-row>
 
-        <relayHeat v-if="event.isRelay" :event="event" :heat="heat" :numLanes="numberOfLanes"></relayHeat>
-        <heat v-else :event="event" :heat="heat" :numLanes="numberOfLanes"></heat>
+        <div v-if="numberOfHeats > 0">
+            <relayHeat v-if="event.isRelay" :event="event" :heat="heat" :numLanes="numberOfLanes"></relayHeat>
+            <heat v-else :event="event" :heat="heat" :numLanes="numberOfLanes"></heat>
+        </div>
 
         <v-row justify="space-between" class="mt-5">
             <v-btn v-if="hasPrevHeat" @click="gotoPreviousHeat" text>
@@ -51,7 +53,7 @@ import { mapState } from 'vuex'
 export default {
     name: 'Event',
     components: { heat, relayHeat },
-    props: ['event'],
+    props: ['event', 'loadlastheat'],
     data() {
         return {
             heat: {},        // the current heat of this event
@@ -81,7 +83,7 @@ export default {
             console.log('need to go to next event ...')
             this.$store.dispatch('meet/getNextEvent').then ( (nextEvent) => {
                 if (nextEvent) {
-                    this.$router.push({ name: 'event', params: {id: nextEvent._id, event: nextEvent} })
+                    this.$router.push({ name: 'event', params: {id: nextEvent._id, event: nextEvent, loadlastheat: false} })
                 }
                 else {
                     this.gotoEventList()
@@ -97,7 +99,7 @@ export default {
             console.log('need to go to previous event ...')
             this.$store.dispatch('meet/getPrevEvent').then ( (prevEvent) => {
                 if (prevEvent) {
-                    this.$router.push({ name: 'event', params: {id: prevEvent._id, event: prevEvent} })
+                    this.$router.push({ name: 'event', params: {id: prevEvent._id, event: prevEvent, loadlastheat: true} })
                 }
                 else {
                     this.gotoEventList()
@@ -113,8 +115,9 @@ export default {
             this.$store.dispatch('meet/loadEvent', {event: this.event})
                 .then( (heats) => {
                     this.heats = heats
-                    console.log(`back from dispatch, heats.length = ${this.heats.length}`)
+                    console.log(`back from dispatch, heats.length = ${this.heats.length}, load-last=${this.loadlastheat}`)
                     if (this.heats.length > 0) {
+                        this.heatIdx = this.loadlastheat ? this.heats.length - 1 : 0
                         this.heat = this.heats[this.heatIdx]
                     }
                 })

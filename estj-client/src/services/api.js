@@ -65,7 +65,6 @@ const ApiService = {
 
     getHeats: (eventId) => {
         const path = `event/${eventId}/heats`
-        console.log(`getHeats: path=${path}`)
         return axios.get(getUrl(path, true))
     },
 

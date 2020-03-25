@@ -34,8 +34,7 @@ const state = {
     activeEvent: false, // reference to the selected/viewed event
     activeMeet: false,  // copy of the selected meet & session
     loading: false,     // true when retrieving meets from DB
-    loadingError: '',   // contains data retrieval error message
-    meets: []           // meets retrieved from DB
+    loadingError: ''    // contains data retrieval error message
 }
 
 const getters = {
@@ -116,8 +115,8 @@ const actions = {
         const cachedHeats = cacheSvc.getHeats(eventId)
         try {
             if (cachedHeats.length > 0) {
-                console.log(`/api/event/heats finds heats in cache, heats.length = ${heats.length}`)
                 heats = cachedHeats
+                console.log(`/api/event/heats finds heats in cache, heats.length = ${heats.length}`)
             }
             else {
                 const response = await apiSvc.getHeats(eventId)

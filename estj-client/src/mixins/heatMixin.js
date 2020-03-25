@@ -1,18 +1,24 @@
+import dqSvc from '../services/dq'
+
 export default {
     data() {
         return {
-            dqRowIndexes: []
+            dqLane: 0  // just needed for DQ reactivity
         }
     },
     methods: {
-        dqAdd(index) {
-            this.dqRowIndexes.push(index)
+        addDq(dqData) {
+            this.dqLane++        // trigger reactivity
+            dqSvc.addDq(dqData)
         },
-        dqRemove(index) {
-            this.dqRowIndexes = this.dqRowIndexes.filter((value) =>  value !== index )
+        isDqd (event, heat, lane) {
+            // add dqLane as a fake parameter so that isDqd is triggered
+            // for all rows after a DQ is added or removed
+            return dqSvc.isDqd(event, heat, lane , this.dqLane)
         },
-        isDqd(index) {
-            return this.dqRowIndexes.includes(index)
+        removeDq (event, heat, lane) {
+            this.dqLane++         // trigger reactivity
+            dqSvc.removeDq(event, heat, lane)
         },
         isLaneOccupied(lane) {
             const entry = this.getEntryByLane(lane)
@@ -50,18 +56,23 @@ export default {
             return entry ? entry.team : ''
         },
         onCancelDq(dlgData) {
-            console.log(`Remove DQ from lane ${dlgData.lane}`)
-            this.dqRemove(dlgData.lane)
+            console.log(`Removing DQ from (${this.event.number}, ${this.heat.number}, ${dlgData.lane})`)
+            this.removeDq(this.event.number, this.heat.number, dlgData.lane)
         },
         onDq(dlgData) {
             if (dlgData.status === 'submit') {
                 const dqData = dlgData.data
-                console.log('Submit DQ data:', dqData)
-                this.dqAdd(dqData.lane)
+                this.addDq(dqData)
             }
             else {
                 console.log('DqDialog cancelled')
             }
         }
+    },
+    created() {
+        // randomize dqLane so that switching from one event to another
+        // will trigger reactivity
+        this.dqLane = Math.floor(Math.random() * 1000)
+        console.log(`heatMixin: randomizing dqLane, value=${this.dqLane}`)
     }
 }
