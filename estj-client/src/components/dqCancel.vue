@@ -48,8 +48,9 @@ export default {
     },
     methods: {
         submitCancel() {
+            const dqData = {action: 'cancel', lane: this.lane}
             this.dialog = false
-            this.$emit('dq-cancel', {lane: this.lane})
+            this.$emit('dq-cancel', dqData)
         }
     }
 }

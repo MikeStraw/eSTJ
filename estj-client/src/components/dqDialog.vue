@@ -89,10 +89,10 @@ export default {
         cancel() {
             this.dialog = false
             this.$refs.dqForm.reset()
-            this.$emit('dq', {status: 'cancel', data: {}})
+            // no need to emit anything
         },
         getDqData() {
-            const dqData = { event: this.event.number, heat: this.heat, lane: this.lane }
+            const dqData = { lane: this.lane }
             const reasonData = []
             for (let elem in this.form.reason) {
                 if (this.form.reason[elem]) reasonData.push(`${elem}`)
@@ -109,12 +109,11 @@ export default {
         },
         submit() {
             const dqData = this.getDqData()
+
+            dqData.action = 'submit'
             this.dialog = false
             this.$refs.dqForm.reset()
-            this.$emit('dq', {
-                status: 'submit',
-                data: dqData
-            })
+            this.$emit('dq', dqData)
         }
     }
 }

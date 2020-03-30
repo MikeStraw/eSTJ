@@ -58,6 +58,10 @@ const ApiService = {
         console.log(`apiSvc:init - baseUrl=${baseUrl}`)
     },
 
+    getBaseUrl: () => {
+        return baseUrl
+    },
+
     getEvents: (meetId, sessNum) => {
         const path = `meet/${meetId}/session/${sessNum}/events`
         return axios.get(getUrl(path, true))
@@ -70,7 +74,14 @@ const ApiService = {
 
     getMeets: () => { return axios.get(getUrl('meets', true)) },
 
-    login: (data) => { return axios.post(getUrl('login', false), data) }
+    login: (userData) => { return axios.post(getUrl('login', false), userData) },
+
+    removeDq: (dqId) => {
+        const path = `dq/${dqId}`
+        return axios.delete(getUrl(path, true))
+    },
+
+    submitDq: (dqData) => { return axios.post(getUrl('dq', true), dqData) }
 }
 
 Object.freeze(ApiService)

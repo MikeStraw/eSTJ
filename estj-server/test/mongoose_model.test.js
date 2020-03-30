@@ -1,4 +1,5 @@
 const dbUtil   = require('./dbUtils')
+const DQ       = require('../models/Dq')
 const Event    = require('../models/Event')
 const Heat     = require('../models/Heat')
 const Meet     = require('../models/Meet')
@@ -36,6 +37,16 @@ describe('Mongo-Mongoose Model Tests', () => {
         expect(heat).not.toBeNull()
         expect(heat.entries.length).toBe(1)
 
+        done()
+    })
+
+    it('should add a DQ with valid data', async done => {
+        const dq = new DQ({
+            heat_id: '123', user_id: '456', lane: 7, notes: 'i am a note', reason: 'because I said so', relayLeg: ''
+        })
+
+        const dqFromDb = await dq.save()
+        expect(dqFromDb._id).not.toBeNull()
         done()
     })
 
@@ -102,6 +113,22 @@ describe('Mongo-Mongoose Model Tests', () => {
         catch(error) {
             expect(error.message).toContain('team')
         }
+        done()
+    })
+
+    it('should reject a DQ without the required data', async done => {
+        // DQ.reason missing
+        const dq = new DQ({heat_id: '123', user_id: '456', lane: 7, notes: 'i am a note'})
+
+        expect.assertions(1)
+        try {
+            const dqFromDb = await dq.save()
+            expect(false)
+        }
+        catch(error) {
+            expect(error.message).toContain('reason')
+        }
+
         done()
     })
 })

@@ -79,11 +79,13 @@ const actions = {
     },
 
     logout( ) {
+        const baseUrl = apiSvc.getBaseUrl() + '/'
         const first = state.user.first ? state.user.first : ''
         const last  = state.user.last  ? state.user.last  : ''
+
         tokenSvc.removeToken()
-        console.log(`User ${first} ${last} logging out.`)
-        location.reload() // reload from the server starts vuex fresh
+        console.log(`User ${first} ${last} logging out, reload ${baseUrl}`)
+        location.replace(baseUrl) // reload from the server starts vuex fresh
     },
 
     setUser( {commit}, user ) {

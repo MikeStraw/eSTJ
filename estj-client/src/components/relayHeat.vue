@@ -40,22 +40,13 @@
 </template>
 
 <script>
-import dqDialog from './dqDialog'
-import dqCancel from './dqCancel'
 import heatMixin from '../mixins/heatMixin'
 
 export default {
     name: 'relayHeat',
-    components: { dqCancel, dqDialog },
     mixins: [heatMixin],
-    props: {
-        event: {type: Object, required: true},
-        heat:  {type: Object, required: true},
-        numLanes: {type: Number, required: true}
-    },
     data() {
-        return {
-        }
+        return {}
     },
     methods: {
         getNameByLeg(lane, leg) {
