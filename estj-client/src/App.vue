@@ -3,7 +3,9 @@
         <stj-header></stj-header>
 
         <v-content>
-            <router-view></router-view>
+            <transition name="fade" mode="out-in" >
+                <router-view></router-view>
+            </transition>
         </v-content>
     </v-app>
 </template>
@@ -21,3 +23,17 @@ export default {
     })
 }
 </script>
+
+<style>
+    .fade-enter {
+        opacity: 0;
+    }
+    .fade-enter-active {
+        transition: opacity 250ms ease;
+    }
+    .fade-leave {}
+    .fade-leave-active {
+        transition: opacity 250ms ease;
+        opacity: 0;
+    }
+</style>
