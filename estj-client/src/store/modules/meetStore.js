@@ -38,7 +38,13 @@ const state = {
 }
 
 const getters = {
-    numLanes: state => { return state.activeEvent.numLanes ? state.activeEvent.numLanes : 8 }
+    hasNextEvent: state => {
+        if (state.activeMeet && state.activeMeet.events)
+            return (state.activeMeet.eventIdx + 1) < state.activeMeet.events.length
+        else
+            return false
+    },
+    hasPrevEvent: state => { return state.activeMeet ? state.activeMeet.eventIdx > 0 : false }
 }
 
 const mutations = {

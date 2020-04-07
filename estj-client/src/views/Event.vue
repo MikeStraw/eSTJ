@@ -28,7 +28,7 @@
             <v-btn v-if="hasPrevHeat" @click="gotoPreviousHeat" text>
                 <v-icon left>mdi-arrow-left</v-icon>Previous Heat
             </v-btn>
-            <v-btn v-else @click="gotoPreviousEvent" text>
+            <v-btn v-else :disabled="! hasPrevEvent" @click="gotoPreviousEvent" text>
                 <v-icon left>mdi-arrow-left</v-icon>Previous Event
             </v-btn>
 
@@ -39,7 +39,7 @@
             <v-btn v-if="hasNextHeat" @click="gotoNextHeat" text>Next Heat
                 <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
-            <v-btn v-else @click="gotoNextEvent" text>Next Event
+            <v-btn v-else :disabled="! hasNextEvent"  @click="gotoNextEvent" text>Next Event
                 <v-icon right>mdi-arrow-right</v-icon>
             </v-btn>
         </v-row>
@@ -49,6 +49,7 @@
 <script>
 import heat from '../components/heat'
 import relayHeat from '../components/relayHeat'
+import { mapGetters } from 'vuex'
 import { mapState } from 'vuex'
 export default {
     name: 'Event',
@@ -66,6 +67,10 @@ export default {
         hasPrevHeat:   function() { return this.heatIdx > 0 },
         numberOfHeats: function() { return  this.heats.length },
         numberOfLanes: function() { return this.event.numLanes ? this.event.numLanes : 0 },
+        ...mapGetters( {
+            hasNextEvent: 'meet/hasNextEvent',
+            hasPrevEvent: 'meet/hasPrevEvent'
+        }),
         ...mapState({
             loading:      state => state.meet.loading,
             loadingError: state => state.meet.loadingError,
@@ -82,12 +87,7 @@ export default {
         gotoNextEvent() {
             console.log('need to go to next event ...')
             this.$store.dispatch('meet/getNextEvent').then ( (nextEvent) => {
-                if (nextEvent) {
-                    this.$router.push({ name: 'event', params: {id: nextEvent._id, event: nextEvent, loadlastheat: false} })
-                }
-                else {
-                    this.gotoEventList()
-                }
+                this.$router.push({ name: 'event', params: {id: nextEvent._id, event: nextEvent, loadlastheat: false} })
             })
 
         },
@@ -98,12 +98,7 @@ export default {
         gotoPreviousEvent() {
             console.log('need to go to previous event ...')
             this.$store.dispatch('meet/getPrevEvent').then ( (prevEvent) => {
-                if (prevEvent) {
-                    this.$router.push({ name: 'event', params: {id: prevEvent._id, event: prevEvent, loadlastheat: true} })
-                }
-                else {
-                    this.gotoEventList()
-                }
+                this.$router.push({ name: 'event', params: {id: prevEvent._id, event: prevEvent, loadlastheat: true} })
             })
         },
         gotoPreviousHeat() {

@@ -6,6 +6,7 @@ const meets = []            // list of available meets and their associated sess
 const events = new Map()    // maps meet+session into a list of events.  {meetId, sessNum} --> events[]
 const heats = new Map()     // maps events into a list of heats.  eventId --> heats[]
 
+const eventKey = (meetId, sessNum) => { return `meetId:${meetId}|sessNum:${sessNum}` }
 
 const CacheService = {
 
@@ -14,9 +15,9 @@ const CacheService = {
     getMeetById: (id)    => { return meets.find( (meet) => meet._id === id) },
     getMeets: ()         => { return meets },
 
-    addEvents: (meetId, sessNum, newEvents) => { events.set({meetId, sessNum}, newEvents) },
+    addEvents: (meetId, sessNum, newEvents) => { events.set(eventKey(meetId, sessNum), newEvents) },
     getEvents: (meetId, sessNum) => {
-        const eventList = events.get({meetId, sessNum})
+        const eventList = events.get(eventKey(meetId, sessNum))
         return  eventList ? eventList : []
     },
 
