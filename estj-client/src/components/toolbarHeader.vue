@@ -1,9 +1,5 @@
 <template>
-    <v-app-bar
-            app
-            class="indigo"
-            dark
-    >
+    <v-app-bar app class="indigo" dark>
         <v-toolbar-title>
             <span class="display-1 font-weight-bold font-italic pr-5">Stroke & Turn Judge</span>
         </v-toolbar-title>

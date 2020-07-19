@@ -7,7 +7,7 @@
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
-    "koa": "^2.11.0",
+    "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-jwt": "^3.6.0",
     "koa-logger": "^3.2.1",
@@ -15,14 +15,14 @@
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "minimist": "^1.2.5",
-    "moment": "^2.24.0",
-    "moment-timezone": "^0.5.28",
-    "mongoose": "^5.9.7"
+    "moment": "^2.27.0",
+    "moment-timezone": "^0.5.31",
+    "mongoose": "^5.9.25"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
-    "jest": "^25.2.7",
+    "jest": "^25.5.4",
     "supertest": "^4.0.2"
   },
   "scripts": {
