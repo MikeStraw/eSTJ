@@ -63,7 +63,7 @@ describe('basic public route tests', () => {
         expect(response.status).toEqual(400)
         done()
     })
-    it('submitting an invalid pin with the  form should return a client error code', async done => {
+    it('submitting an invalid pin with the form should return a client error code', async done => {
         const response = await request(server).post('/login')
             .send({firstname: 'Buggs', lastname: 'Bunny', pin: 'xxxxx'})
             .set('Accept', 'application/json')

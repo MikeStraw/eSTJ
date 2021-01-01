@@ -1,10 +1,11 @@
-const envResult = require('dotenv').config()
-const apiServer = require('./apiServer')
-const argv      = require('minimist')(process.argv.slice(2))  //[0] = node.exe, [1] =.../index.js
-const debug     = require('debug')('estj-server')
-const fs        = require('fs')
-const meetDbo   = require('./services/SwimMeetDbo')
-const mongoose  = require('mongoose')
+const envResult  = require('dotenv').config()
+const apiServer  = require('./apiServer')
+const argv       = require('minimist')(process.argv.slice(2))  //[0] = node.exe, [1] =.../index.js
+const debug      = require('debug')('estj-server')
+const fs         = require('fs')
+const meetDbo    = require('./services/SwimMeetDbo')
+const meetUpdate = require('./services/fileUpdate')
+const mongoose   = require('mongoose')
 
 /**
  * Runs the eSTJ server.
@@ -72,13 +73,8 @@ function checkCmdLineArgs(argv)
     if (argv.file &&  typeof(argv.file) === 'boolean') {
         pgmOptions.errors.push('The --file option requires an argument.')
     }
-
-    if (argv.watch && ! argv.file) {
-        pgmOptions.errors.push('If using --watch, the --file option must also be used.')
-    }
-
-    if (argv.noapi && ! argv.file) {
-        pgmOptions.errors.push('If using --noapi, the --file option must be used.')
+    if (argv.watch &&  typeof(argv.watch) === 'boolean') {
+        pgmOptions.errors.push('The --watch option requires an argument.')
     }
 
     pgmOptions.help = argv.help
@@ -89,17 +85,24 @@ function checkCmdLineArgs(argv)
     return pgmOptions
 }
 
+
+/**
+ * Run the estj-server.
+ * @param pgmOptions
+ * @returns {Promise<boolean>}
+ */
 async function runProgram(pgmOptions)
 {
     debug('Inside runProgram')
     if (pgmOptions.meetFile) {
+        debug(`inserting meet file ${pgmOptions.meetFile} into DB`)
         const meetJson = JSON.parse(fs.readFileSync(pgmOptions.meetFile, 'utf8'))
         await meetDbo.saveToDB(meetJson)
     }
 
     if (pgmOptions.watchFile) {
         debug(`watching file ${pgmOptions.watchFile}`)
-        //watchFile(pgmOptions.meetFile)
+        watchFile(pgmOptions.watchFile)
     }
 
     if (pgmOptions.runApiServer) {
@@ -114,21 +117,53 @@ async function runProgram(pgmOptions)
     return (finishedProcessing)
 }
 
+
 /**
  * Logs a usage message to the console.
  */
 function usage()
 {
-    const help = '\nUSAGE: node index.js [--dsn mongo-dsn] [--file meet-file] [--noapi] [--watch]\n'    +
+    const help = '\nUSAGE: node index.js [--dsn mongo-dsn] [--file meet-file] [--noapi] [--watch meet-file]\n'    +
         'Where:  \n' +
-        '    --help           --> prints this help message.\n' +
-        '    --dsn  mongo-dsn --> the MongoDB connection data source name (DSN).\n' +
-        '                         If not supplied a default DSN is used.\n' +
-        '    --file meet-file --> insert the JSON formatted meet data file into the Mongo DB.\n' +
-        '    --noapi          --> do not start the node API server to service eSTJ-client requests.\n' +
-        '    --watch          --> watch the meet information file for updates.\n'
+        '    --help            --> prints this help message.\n' +
+        '    --dsn  mongo-dsn  --> the MongoDB connection data source name (DSN).\n' +
+        '                          If not supplied a default DSN is used.\n' +
+        '    --file meet-file  --> insert the JSON formatted meet data file into the Mongo DB.\n' +
+        '    --noapi           --> do not start the node API server to service eSTJ-client requests.\n' +
+        '    --watch meet-file --> watch the JSON formatted meet data file for updates and\n' +
+        '                          send meet update events to the connected clients.\n'
 
     console.log(help)
+}
+
+/**
+ * Watches the JSON file representation of the meet for changes.  When an update
+ * occurs, perform a diff and send meet update events to the listening clients.
+ * @param meetJsonFile
+ */
+function watchFile(meetJsonFile)
+{
+    if (! fs.existsSync(meetJsonFile)) {
+        debug.error(`ERROR: JSON file ${meetJsonFile} does not exist.`)
+        return
+    }
+    let curJson = JSON.parse(fs.readFileSync(meetJsonFile, 'utf8'))
+
+    // Need to debounce so that we don't get multiple messages for a single update
+    let fsWait = false
+    fs.watch(meetJsonFile, (event, filename) => {
+        if (filename) {
+            if (fsWait) { /* triggered again w/in 100 ms --> do nothing */ }
+            else {
+                fsWait = true
+                setTimeout(() => {
+                    curJson = meetUpdate.processUpdate(meetJsonFile, curJson)
+                    fsWait = false
+                }, 100)
+            }
+        }
+    })
+
 }
 
 /**

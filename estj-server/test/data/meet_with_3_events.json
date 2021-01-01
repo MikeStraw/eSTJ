@@ -1,0 +1,252 @@
+{
+    "date": "2020-01-02",
+    "name": "Westerville Test vs. Nobody",
+    "numLanes": 8,
+    "type": "HighSchool",
+    "sessions": [
+      {
+        "number": 1, "name": "JV and Varsity", "day": 1, "time": "06:00 pm",
+        "events": [
+            {
+              "desc": "Boys 100 Butterfly  - Varsity", "isRelay": false, "numLanes": 6, "number": 1,
+              "entries": [
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Ryan",
+                    "lname": "Shaw",
+                    "schoolYear": "JR",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "1:03.94",
+                  "heat": 1,
+                  "lane": 5,
+                  "seed": "1:02.90",
+                  "team": "Gahanna Lincoln"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Kevin",
+                    "lname": "Loushin",
+                    "schoolYear": "JR",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "1:03.46",
+                  "heat": 1,
+                  "lane": 4,
+                  "seed": "1:02.65",
+                  "team": "Warhawks"
+                },
+                {
+                  "athlete": {
+                    "age": 16,
+                    "fname": "Peter",
+                    "lname": "Reventlow",
+                    "schoolYear": "SR",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "1:01.27",
+                  "heat": 1,
+                  "lane": 3,
+                  "seed": "1:01.67",
+                  "team": "Gahanna Lincoln"
+                },
+                {
+                  "athlete": {
+                    "age": "15",
+                    "fname": "Maximus",
+                    "lname": "Cramer",
+                    "schoolYear": "SO",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "1:12.49",
+                  "heat": 1,
+                  "lane": 2,
+                  "seed": "1:12.79",
+                  "team": "Warhawks"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Abigail",
+                    "lname": "Gilger",
+                    "schoolYear": "JR",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "1:10.08",
+                  "heat": 2,
+                  "lane": 3,
+                  "seed": "1:12.14",
+                  "team": "Gahanna Lincoln"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Jalyn",
+                    "lname": "Meadows",
+                    "schoolYear": "SO",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "1:20.28",
+                  "heat": 2,
+                  "lane": 1,
+                  "seed": "NT",
+                  "team": "Gahanna Lincoln"
+                }
+              ]
+            },
+            {
+              "desc": "Girls 100 Freestyle  - Varsity", "isRelay": false, "numLanes": 6, "number": 2,
+              "entries": [
+                {
+                  "athlete": {
+                    "age": 15,
+                    "fname": "Ally",
+                    "lname": "Wharton",
+                    "schoolYear": "JR",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "57.50",
+                  "heat": 1,
+                  "lane": 3,
+                  "seed": "54.72",
+                  "team": "Gahanna Lincoln"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Stefani",
+                    "lname": "Wasmer",
+                    "schoolYear": "SO",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "1:03.45",
+                  "heat": 1,
+                  "lane": 1,
+                  "seed": "1:03.20",
+                  "team": "Gahanna Lincoln"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Kaila",
+                    "lname": "Aaron",
+                    "schoolYear": "FR",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "58.84",
+                  "heat": 1,
+                  "lane": 4,
+                  "seed": "57.80",
+                  "team": "Warhawks"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Jackie",
+                    "lname": "Kay",
+                    "schoolYear": "SR",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "1:03.82",
+                  "heat": 1,
+                  "lane": 6,
+                  "seed": "1:03.71",
+                  "team": "Warhawks"
+                },
+                {
+                  "athlete": {
+                    "age": 0,
+                    "fname": "Mia",
+                    "lname": "Rivera",
+                    "schoolYear": "FR",
+                    "teamName": "Warhawks"
+                  },
+                  "final": "1:03.21",
+                  "heat": 1,
+                  "lane": 2,
+                  "seed": "1:02.25",
+                  "team": "Warhawks"
+                },
+                {
+                  "athlete": {
+                    "age": 18,
+                    "fname": "Regan",
+                    "lname": "Nolan",
+                    "schoolYear": "SR",
+                    "teamName": "Gahanna Lincoln"
+                  },
+                  "final": "58.60",
+                  "heat": 1,
+                  "lane": 5,
+                  "seed": "57.16",
+                  "team": "Gahanna Lincoln"
+                }
+              ]
+          },
+          {
+            "desc": "Boys 100 Freestyle  - Varsity", "isRelay": false, "numLanes": 6, "number": 3,
+            "entries": [
+              {
+                "athlete": {
+                  "age": 17,
+                  "fname": "Major",
+                  "lname": "Belli",
+                  "schoolYear": "JR",
+                  "teamName": "Gahanna Lincoln"
+                },
+                "final": "50.15",
+                "heat": 1,
+                "lane": 3,
+                "seed": "48.08",
+                "team": "Gahanna Lincoln"
+              },
+              {
+                "athlete": {
+                  "age": 0,
+                  "fname": "Keenan",
+                  "lname": "Lucas",
+                  "schoolYear": "SO",
+                  "teamName": "Gahanna Lincoln"
+                },
+                "final": "1:08.66",
+                "heat": 1,
+                "lane": 5,
+                "seed": "1:11.26",
+                "team": "Gahanna Lincoln"
+              },
+              {
+                "athlete": {
+                  "age": 0,
+                  "fname": "Brandon",
+                  "lname": "Gifford",
+                  "schoolYear": "FR",
+                  "teamName": "Warhawks"
+                },
+                "final": "1:14.98",
+                "heat": 1,
+                "lane": 2,
+                "seed": "1:15.13",
+                "team": "Warhawks"
+              },
+              {
+                "athlete": {
+                  "age": 0,
+                  "fname": "Derek",
+                  "lname": "Rymers",
+                  "schoolYear": "JR",
+                  "teamName": "Warhawks"
+                },
+                "final": "52.94",
+                "heat": 1,
+                "lane": 4,
+                "seed": "52.28",
+                "team": "Warhawks"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}
