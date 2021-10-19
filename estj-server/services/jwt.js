@@ -30,7 +30,7 @@ function JWTErrorHandler(ctx, next) {
 
 module.exports = {
     jwt: ()               => { return jwtInstance },
-    decode: (token)       => { return jasonwebtoken.decode(token, {complete: true})},
+    decode: (token)       => { return jsonwebtoken.decode(token, {complete: true})},
     errorHandler: ()      => { return JWTErrorHandler },
     issueToken: (payload) => { return jsonwebtoken.sign(payload, SECRET, signVerifyOptions) }
 }

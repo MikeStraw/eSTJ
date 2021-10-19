@@ -4,11 +4,11 @@
   "description": "Electronic Stroke and Turn Judge",
   "main": "index.js",
   "dependencies": {
-    "debug": "^4.3.1",
+    "debug": "^4.3.2",
     "deep-diff": "^1.0.2",
     "dotenv": "^8.6.0",
     "jsonwebtoken": "^8.5.1",
-    "koa": "^2.13.1",
+    "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-jwt": "^3.6.0",
     "koa-logger": "^3.2.1",
@@ -18,7 +18,7 @@
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
-    "mongoose": "^5.12.12"
+    "mongoose": "^5.13.12"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
