@@ -84,8 +84,8 @@ function makeHeatEntryFromEventEntry(eventEntry) {
 
 /**
  * Save the Event data to the Mongo DB.
- * @param {Object} eventJson - Saves the event into the mongo DB.  eventJson is modified by this method.
- * @param {String} meetId - The mongo ID of the meet.
+ * @param {Object} eventJson - Saves the event into the mongo DB.
+ * @param {string} meetId - The mongo ID of the meet.
  * @returns {Promise<Document>} - The promise resolves to the saved mongoose Event document.
  */
 function saveEventData(eventJson, meetId)
@@ -132,10 +132,45 @@ function saveMeetAndSessions(meetJson) {
 
 module.exports = {
     /**
+     * Delete the meet from the DB.  Will delete all the associated sessions, events, heats and DQs.
+     * @param {string} meetId - The mongo ID of the meet.
+     */
+    deleteMeet: async function (meetId) {
+        // TODO: Not implemented yet.
+        // events = findAllEventByMeetId(meetId)
+        // for (event of events) {
+        //     heats = findAllHeatsByEventId(event._id)
+        //     for (heat of heats) {
+        //         dqs = findAllDqsByHeatId(heat._id)
+        //         for (dq of dqs) {
+        //             dq.delete()
+        //         }
+        //         heat.delete()
+        //     }
+        //     event.delete()
+        //  }
+        //  meet.delete()
+    },
+
+    /**
+     * Get the meetId associated with the meet name and date.
+     * @param {string} meetName
+     * @param {string} meetDate
+     * @returns {string} meetId or undefined if the meet is not in the DB
+     */
+    getMeetId: async function (meetName, meetDate) {
+        const dbMeetDate = moment.tz(meetDate, 'America/New_York').format()
+        const queryObj = {'name': meetName, 'date': dbMeetDate}
+        const meetId = await Meet.findOne(queryObj, '_id').exec()
+
+        return meetId._id
+    },
+
+    /**
      * Save the swim meet JSON data into the DB.  The incoming meetJson object is modified during
      * this process.
      * @param {Object} meetJson - The JSON representation of the swim meet as produced by mm_to_json
-     * @returns {Promise<void>}
+     * @returns {string} meetId - The Mongo ID of the newly added meet.
      */
     saveToDB: async function(meetJson) {
         // Because we save the meet/session, event and entries in separate mongo collections,
@@ -156,5 +191,28 @@ module.exports = {
                 await saveHeatData(heat)
             }
         }
+        return meetId
+    },
+
+    /**
+     *
+     * @param {Object[] }newEntries the array of new entries for the heat
+     * @param {UpdateItem} queryObj contains the query info to find the heat in the DB
+     * @return {Promise<void>}
+     */
+    updateHeatEntries: async function(newEntries, queryObj) {
+        const conditions = {meet_id: queryObj.meetId, session_num: queryObj.session, number: queryObj.event}
+        const event = await Event.findOne(conditions)
+        const eventId = event._id
+
+        // Remove the entry.heat property which is found in the JSON but not in the DB.
+        // Make a copy of newEntries so that we don't overwrite data in the original.
+        const entries = newEntries.slice()
+        for(let entry of entries) {
+            delete entry.heat
+        }
+
+        return Heat.findOneAndUpdate({'event_id': eventId, number: queryObj.heat},
+                                      {entries: entries}, {'upsert': true}).exec()
     }
 }

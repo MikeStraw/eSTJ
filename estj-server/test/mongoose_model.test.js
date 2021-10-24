@@ -122,12 +122,23 @@ describe('Mongo-Mongoose Model Tests', () => {
 
         expect.assertions(1)
         try {
-            const dqFromDb = await dq.save()
+            await dq.save()
             expect(false)
         }
         catch(error) {
             expect(error.message).toContain('reason')
         }
+
+        done()
+    })
+
+    it('getMeetId should return the meet ID for a meet inserted into the DB', async done => {
+        const json = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
+        const meetId = await meetDbo.saveToDB(json)
+
+        const id = await meetDbo.getMeetId(json.name, json.date)
+        //console.log(`name: ${json.name}, date: ${json.date}, meetId: ${meetId}, id: ${id}`)
+        expect(id).toEqual(meetId)
 
         done()
     })

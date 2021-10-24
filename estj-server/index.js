@@ -7,6 +7,8 @@ const meetDbo    = require('./services/SwimMeetDbo')
 const meetUpdate = require('./services/fileUpdate')
 const mongoose   = require('mongoose')
 
+const meetIdMap = new Map()   // Maps meet name + date --> meet ID
+
 /**
  * Runs the eSTJ server.
  * @returns {Promise<>}
@@ -28,8 +30,6 @@ function main()
             debug(`Warning:  error found in the .env file: ${envResult.error}`)
         }
         process.on('unhandledRejection', error => { reject(error) })
-
-
 
         const connectOpts = {
             useNewUrlParser: true,    // uses port number in DSN
@@ -87,6 +87,51 @@ function checkCmdLineArgs(argv)
 
 
 /**
+ * Update the DB with the changes from the changed meetJsonFile.
+ * @param meetJsonFile the meet JSON file with the latest updates
+ * @param curJson the current representation of the meet
+ * @returns {*} the representation of the updated meet as read from meetJsonFile
+ */
+async function handleMeetUpdate(meetJsonFile, curJson) {
+    debug(`Update detected in file ${meetJsonFile}`)
+
+    meetUpdate.createMeetBackup(meetJsonFile, curJson)
+
+    const newJson = JSON.parse(fs.readFileSync(meetJsonFile, 'utf8'))
+    const updateResult = meetUpdate.diffUpdate(curJson, newJson)
+    debug(updateResult)
+
+    if (updateResult.updateSupported === false) {
+        debug.error('Unsupported update ... HELP!')
+        // Really need to delete old meet and save new meet,
+        // then signal clients to reload with new meet ID.
+        throw 'Unsupported meet update ... exiting.'
+    }
+    else {
+        const meetKey = `${newJson.name}:${newJson.date}`
+        let   meetId  = meetIdMap.get(meetKey)
+        if (! meetId) {
+            meetId = await meetDbo.getMeetId(newJson.name, newJson.date)
+            meetIdMap.set(meetKey, meetId)
+        }
+
+        for (let updateItem of updateResult.updateItems) {
+            updateItem.meetId = meetId
+
+            // If event # and heat # are present, replace all of the heat.entries
+            // with data from the newJson object
+            if (updateItem.event && updateItem.heat) {
+                const newEntries = meetUpdate.getHeatEntries(newJson, updateItem)
+                await meetDbo.updateHeatEntries(newEntries, updateItem)
+            }
+        }
+
+    }
+    return newJson
+}
+
+
+/**
  * Run the estj-server.
  * @param pgmOptions
  * @returns {Promise<boolean>}
@@ -95,9 +140,12 @@ async function runProgram(pgmOptions)
 {
     debug('Inside runProgram')
     if (pgmOptions.meetFile) {
-        debug(`inserting meet file ${pgmOptions.meetFile} into DB`)
         const meetJson = JSON.parse(fs.readFileSync(pgmOptions.meetFile, 'utf8'))
-        await meetDbo.saveToDB(meetJson)
+        const meetId = await meetDbo.saveToDB(meetJson)
+        debug(`inserting meet file ${pgmOptions.meetFile} into DB, ID: ${meetId}`)
+
+        const meetKey = `${meetJson.name}:${meetJson.date}`
+        meetIdMap.set(meetKey, meetId)
     }
 
     if (pgmOptions.watchFile) {
@@ -157,7 +205,7 @@ function watchFile(meetJsonFile)
             else {
                 fsWait = true
                 setTimeout(() => {
-                    curJson = meetUpdate.processUpdate(meetJsonFile, curJson)
+                    curJson = handleMeetUpdate(meetJsonFile, curJson)
                     fsWait = false
                 }, 100)
             }

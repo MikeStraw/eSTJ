@@ -19,9 +19,9 @@ afterAll( () => {
 describe('JSON Meet File Update Tests', () => {
     it('File update without changes should not return any update items.', async done => {
         const curJson = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
-        const newJsonFileSpec = './test/data/valid_meet_with_session_event_heat.json'
+        const newJson = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         expect(result.updateItems.length).toBe(0)
         expect(result.updateSupported).toBe(true)
@@ -30,10 +30,10 @@ describe('JSON Meet File Update Tests', () => {
 
     it('File update without meaningful changes should not return any update items.', async done => {
         const curJson = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
-        const newJsonFileSpec = './test/data/valid_meet_with_session_event_heat.json'
+        const newJson = testUtils.readTestFile('valid_meet_with_session_event_heat.json')
 
-        curJson.type = 'Age Group'
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        newJson.type = 'Age Group'
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         expect(result.updateItems.length).toBe(0)
         expect(result.updateSupported).toBe(true)
@@ -42,13 +42,13 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Updating final times in a single heat should return 1 update item for that heat.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // remove final time from event #2 entries (all heat #1)
         const eventEntries = curJson.sessions[0].events[1].entries
         eventEntries.forEach( entry => entry.final = '')
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         // Expect 1 update item for event #2, heat #1
         expect(result.updateItems.length).toBe(1)
@@ -61,13 +61,13 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Updating final times in two heats should return 2 update items for the heats.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // remove final time from event #1 entries (both heat #1 and #2)
         const eventEntries = curJson.sessions[0].events[0].entries
         eventEntries.forEach( entry => entry.final = '')
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         // Expect 2 update items ...event #1, heat #1 and event #1 heat #2
         expect(result.updateItems.length).toBe(2)
@@ -83,13 +83,13 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Adding an entry in a heat should return 1 updateItem for that event.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // remove the last entry from event #2 (removing from curJson is like an add for newJson)
         const eventEntries = curJson.sessions[0].events[1].entries
         eventEntries.pop()
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         // Expect 1 update item for event #2, heat #1
         expect(result.updateItems.length).toBe(1)
@@ -101,14 +101,14 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Deleting an entry in a heat should return 1 updateItem for that event.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // Add an entry to event #2 (adding to curJson is like a delete for newJson)
         const eventEntries = curJson.sessions[0].events[1].entries
         const newEntry = '{"athlete": {}, "final": "", "heat": 2, "lane": 1, "seed": "NT", "team": "" }'
         eventEntries.push(newEntry)
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         // Expect 1 update item for event #2, heat #1
         expect(result.updateItems.length).toBe(1)
@@ -120,7 +120,7 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Switching lanes within a single heat should return 1 update item for that heat.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // switch lanes
         const eventEntries = curJson.sessions[0].events[1].entries
@@ -128,7 +128,7 @@ describe('JSON Meet File Update Tests', () => {
         eventEntries[0].lane = eventEntries[1].lane
         eventEntries[1].lane = tmp
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         // Expect 1 update item for event #2, heat #1
         expect(result.updateItems.length).toBe(1)
@@ -141,13 +141,13 @@ describe('JSON Meet File Update Tests', () => {
 
     it('Adding an event should return an unsupported update result.', async done => {
         const curJson = testUtils.readTestFile('meet_with_3_events.json')
-        const newJsonFileSpec = './test/data/meet_with_3_events.json'
+        const newJson = testUtils.readTestFile('meet_with_3_events.json')
 
         // remove the last event (removing from curJson is like an add for newJson)
         const events = curJson.sessions[0].events
         events.pop()
 
-        let result = updateSvc.processUpdate(newJsonFileSpec, curJson)
+        let result = updateSvc.diffUpdate(curJson, newJson)
 
         expect(result.updateItems.length).toBe(0)
         expect(result.updateSupported).toBe(false)

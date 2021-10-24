@@ -2,9 +2,8 @@
  * fileUpdate module
  * @module services/fileUpdate
  * This module provides the services to handle updates to the swim meet JSON file.
- * Specifically, changes may trigger Mongo DB updates and send update events
- * to the connected clients.
- * This module depends on an open Mongoose connection to the Mongo DB.
+ * Services include diffing different versions of the meet json object,
+ * backing up the meet json file and extracting data from the meet json object.
  */
 const debug  = require('debug')('estj-server')
 const fs     = require('fs')
@@ -29,8 +28,7 @@ class UpdateItem {
  * The return type from processUpdate
  */
 class UpdateResponse {
-    constructor (json, updateItems, updateSupported = true) {
-        this.newJson = json                      // new meet JSON
+    constructor (updateItems, updateSupported = true) {
         this.updateItems = updateItems           // array of UpdateItems
         this.updateSupported = updateSupported   // false means reprocess entire JSON, not updates
     }
@@ -40,7 +38,7 @@ class UpdateResponse {
  * Coalesce multiple event and heat update items into single update items.  In particular,
  * multiple entry type updates for a particular heat are converted into a single heat update
  * and multiple entry add/deletes are converted into a single event update.
- * @param updateItems the incoming list of updates
+ * @param {UpdateItem[]} updateItems the incoming list of updates
  * @returns {UpdateItem[]} the coalesced list of updates
  */
 function coalesceUpdates(updateItems)
@@ -71,8 +69,8 @@ function coalesceUpdates(updateItems)
 /**
  * Convert the deep-diff path array ('level-1', idx, 'level-2', idx, ... , 'field-name')
  * into a javascript object {level-1: idx, level-2: idx, ... , field: 'field-name'}
- * @param path the deep-diff path array
- * @returns {{}}
+ * @param {String} path the deep-diff path array
+ * @returns {{Object}}
  */
 function diffPathToObj(path)
 {
@@ -91,8 +89,8 @@ function diffPathToObj(path)
 
 /**
  * Convert the deep-diff difference item into an updateItem
- * @param curJson the current JSON representation of the meet
- * @param diffItem the deep-diff difference item
+ * @param {Object} curJson the current JSON representation of the meet
+ * @param {Object} diffItem the deep-diff difference item
  * @returns {UpdateItem} information about the data that was updated
  */
 function diffToUpdateItem(curJson, diffItem)
@@ -129,15 +127,20 @@ function diffToUpdateItem(curJson, diffItem)
 }
 
 
-// Convenience functions to find data in an array by index.  Improves readability.
+// Convenience functions to find json data in an array by index or number.  Improves readability.
 function findEntryByIndex(event, idx) { return event.entries[idx] }
+function findEntriesByHeatNumber(event, heatNum) { return event.entries.filter(entry => entry.heat === heatNum) }
+
 function findEventByIndex(session, idx) { return session.events[idx] }
+function findEventByNumber(session, num) { return session.events.find(event => event.number === num) }
+
 function findSessionByIndex(meetJson, idx) { return meetJson.sessions[idx] }
+function findSessionByNumber(meetJson, num) { return meetJson.sessions.find(session => session.number === num) }
 
 
 /**
  * Get the next name of the next backup file for this meet file.
- * @param meetFileSpec the full path of the JSON meet file
+ * @param {string} meetFileSpec the full path of the JSON meet file
  * @returns {string} the full path name of the backup file
  */
 function getBackupFileSpec(meetFileSpec)
@@ -148,15 +151,14 @@ function getBackupFileSpec(meetFileSpec)
         MeetFileNumber = 1
     }
 
-    debug(`backup file spec is ${fileSpec}, new meet file number is ${MeetFileNumber}`)
     return fileSpec
 }
 
 
 /**
  * Save the json data to a file
- * @param fileSpec full path tot the file
- * @param jsonData the JSON meet data
+ * @param {string} fileSpec full path tot the file
+ * @param {Object} jsonData the JSON meet data
  */
 function saveJsonToFile(fileSpec, jsonData)
 {
@@ -171,8 +173,8 @@ function saveJsonToFile(fileSpec, jsonData)
 /**
  * Update an existing entry.
  * Get the session #, event #, heat # and lane # info associated with final-time update
- * @param meetJson the current (old) version of the json meet representation
- * @param diffObj identifies a single field that was changed in an entry
+ * @param {Object} meetJson the current (old) version of the json meet representation
+ * @param {Object} diffObj identifies a single field that was changed in an entry
  * @returns {UpdateItem}
  */
 function updateEntry(meetJson, diffObj)
@@ -194,9 +196,9 @@ function updateEntry(meetJson, diffObj)
 /**
  * Add or delete an entry in the array of entries.
  * Get the session # and event # info associated with the entry add/delete
- * @param meetJson the current (old) version of the json meet representation
- * @param diffObj identifies a single entry that was changed in the array of entries
- * @returns {{}}
+ * @param {Object} meetJson the current (old) version of the json meet representation
+ * @param {Object} diffObj identifies a single entry that was changed in the array of entries
+ * @returns {UpdateItem}
  */
 function updateEntries(meetJson, diffObj)
 {
@@ -216,26 +218,27 @@ module.exports = {
     UpdateItem: UpdateItem,
 
     /**
-     * Read the updated meet JSON file and perform a diff with the current JSON
-     * representation.  Perform the necessary Mongo DB updates and inform
-     * the connected clients of the changes.
-     * @param meetFileSpec the name of the meet JSON file that was just updated
-     * @param curJson the current representation of the meet
-     * @returns {UpdateResponse} the JSON representation of the updated meet
-     * and a list of update items to process
+     * Create a backup file based on the fileSpec and json data.
+     * @param {string} fileSpec the name of the meet JSON file that was just updated
+     * @param {Object} json the current representation of the meet
      */
-    processUpdate: function(meetFileSpec, curJson) {
-        debug(`Meet JSON file ${meetFileSpec} updated ... processing update.`)
+    createMeetBackup: function(fileSpec, json) {
+        const meetBackupFile = getBackupFileSpec(fileSpec)
 
-        // Save current JSON File
-        const meetBackupFile = getBackupFileSpec(meetFileSpec)
-        saveJsonToFile(meetBackupFile, curJson)
+        saveJsonToFile(meetBackupFile, json)
+        debug(`Create backup file ${meetBackupFile} from ${fileSpec}.`)
+    },
 
-        const newJson = JSON.parse(fs.readFileSync(meetFileSpec, 'utf8'))
+    /**
+     * Perform a diff between the current and new meet representations
+     * @param {Object} curJson the current representation of the meet
+     * @param {Object} newJson the new representation of the meet
+     * @returns {UpdateResponse} a list of update items to process
+     */
+    diffUpdate: function(curJson, newJson) {
         const diffArray = diff(curJson, newJson)
         if (! diffArray) {
-            // if no difference between current JSON and new JSON, diffArray is undefined
-            return new UpdateResponse(newJson, [], true)
+            return new UpdateResponse([], true)
         }
 
         // collect all the updates in the diff
@@ -258,9 +261,23 @@ module.exports = {
             }
         }
 
-        // coalesce multiple updates for an event or heat
+        // Coalesce multiple updates for an event or heat so that the
+        // event + heat or just the event is identified as changed.
         const updateList = coalesceUpdates(updateItems)
 
-        return new UpdateResponse(newJson, updateList, updateSupported)
+        return new UpdateResponse(updateList, updateSupported)
+    },
+
+    /**
+     * Return the array of entries for a particular heat in the meet json.
+     * @param {Object} meetJson representation of the meet in json format
+     * @param {UpdateItem} queryObj object specifying the session, event and heat number
+     * @return {Object[]} array
+     */
+    getHeatEntries: function(meetJson, queryObj) {
+        const session = findSessionByNumber(meetJson, queryObj.session)
+        const event   = findEventByNumber(session, queryObj.event)
+        const entries = findEntriesByHeatNumber(event, queryObj.heat)
+        return (entries)
     }
 }
