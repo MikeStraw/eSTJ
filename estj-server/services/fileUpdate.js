@@ -46,6 +46,7 @@ function coalesceUpdates(updateItems)
     let eventMap = new Map()
     let heatMap = new Map()
 
+    // Just keep 1 update for each session:event:heat and session:event
     updateItems.forEach( updateItem => {
         if (updateItem.heat) {
             const key = `:${updateItem.session}:${updateItem.event}:${updateItem.heat}:`
@@ -61,8 +62,18 @@ function coalesceUpdates(updateItems)
         }
     })
 
-    debug(`CoalesceUpdates ... eventMap.size=${eventMap.size}, heatMap.size=${heatMap.size}`)
-    return Array.from(heatMap.values()).concat(Array.from(eventMap.values()))
+    // Create a list of heat updates that don't have a corresponding event update.
+    // (ie, If updating the entire heat, don't worry about an update for a heat in that event)
+    const heatUpdates = []
+    heatMap.forEach( updateItem => {
+        const key = `:${updateItem.session}:${updateItem.event}:`
+        if (eventMap.has(key) === false) {
+            heatUpdates.push(updateItem)
+        }
+    })
+
+    debug(`CoalesceUpdates ... event updates=${eventMap.size}, heat-only updates=${heatUpdates.length}`)
+    return Array.from(eventMap.values()).concat(heatUpdates)
 }
 
 
@@ -269,15 +280,29 @@ module.exports = {
     },
 
     /**
+     * Return the event object from the meetJson data identified by the info in queryObj..
+     * @param {Object} meetJson representation of the meet in json format
+     * @param {UpdateItem} queryObj object specifying the session and event
+     * @return {Object} event json object
+     */
+    getEvent: function(meetJson, queryObj) {
+        const session = findSessionByNumber(meetJson, queryObj.session)
+        const event   = findEventByNumber(session, queryObj.event)
+
+        return (event)
+    },
+
+    /**
      * Return the array of entries for a particular heat in the meet json.
      * @param {Object} meetJson representation of the meet in json format
      * @param {UpdateItem} queryObj object specifying the session, event and heat number
-     * @return {Object[]} array
+     * @return {Object[]} array of entries
      */
     getHeatEntries: function(meetJson, queryObj) {
         const session = findSessionByNumber(meetJson, queryObj.session)
         const event   = findEventByNumber(session, queryObj.event)
         const entries = findEntriesByHeatNumber(event, queryObj.heat)
+
         return (entries)
     }
 }

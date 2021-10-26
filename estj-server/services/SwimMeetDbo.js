@@ -195,8 +195,26 @@ module.exports = {
     },
 
     /**
-     *
-     * @param {Object[] }newEntries the array of new entries for the heat
+     * Update all the entries for a specific event
+     * @param {Object }eventJson the array of new entries for the heat
+     * @param {UpdateItem} queryObj contains the query info to find the heat in the DB
+     * @return {Promise<void>}
+     */
+    updateEventEntries: async function(eventJson, queryObj) {
+        const conditions = {meet_id: queryObj.meetId, session_num: queryObj.session, number: queryObj.event}
+        const event      = await Event.findOne(conditions)
+        const eventId    = event._id
+        const heats      = extractHeatsFromEvent(eventJson)  // array of heat objects suitable for DB
+
+        for (const heat of heats) {
+            heat.event_id = eventId
+            await saveHeatData(heat)
+        }
+    },
+
+    /**
+     * Update all the entries for a specific heat in an event.
+     * @param {Object[] }newEntries the array of new entries for the heat (json)
      * @param {UpdateItem} queryObj contains the query info to find the heat in the DB
      * @return {Promise<void>}
      */
@@ -211,6 +229,7 @@ module.exports = {
         for(let entry of entries) {
             delete entry.heat
         }
+        entries.sort( (a, b) => a.lane - b.lane )
 
         return Heat.findOneAndUpdate({'event_id': eventId, number: queryObj.heat},
                                       {entries: entries}, {'upsert': true}).exec()

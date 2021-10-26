@@ -124,8 +124,12 @@ async function handleMeetUpdate(meetJsonFile, curJson) {
                 const newEntries = meetUpdate.getHeatEntries(newJson, updateItem)
                 await meetDbo.updateHeatEntries(newEntries, updateItem)
             }
+            // Else, just event changes.
+            else if (updateItem.event) {
+                const newEvent = meetUpdate.getEvent(newJson, updateItem)
+                await meetDbo.updateEventEntries(newEvent, updateItem)
+            }
         }
-
     }
     return newJson
 }
@@ -204,8 +208,8 @@ function watchFile(meetJsonFile)
             if (fsWait) { /* triggered again w/in 100 ms --> do nothing */ }
             else {
                 fsWait = true
-                setTimeout(() => {
-                    curJson = handleMeetUpdate(meetJsonFile, curJson)
+                setTimeout(async () => {
+                    curJson = await handleMeetUpdate(meetJsonFile, curJson)
                     fsWait = false
                 }, 100)
             }
