@@ -34,7 +34,7 @@
 
             <v-btn @click="gotoEventList" text><v-icon>mdi-list</v-icon>Event List</v-btn>
 
-            <v-btn @click="refresh" text><v-icon left>mdi-refresh</v-icon>Refresh</v-btn>
+            <v-btn @click="refresh" :disabled="!heatDirty" text><v-icon left>mdi-refresh</v-icon>Refresh</v-btn>
 
             <v-btn v-if="hasNextHeat" @click="gotoNextHeat" text>Next Heat
                 <v-icon right>mdi-arrow-right</v-icon>
@@ -63,6 +63,8 @@ export default {
         }
     },
     computed: {
+        //heatDirty:     function() { return this.$store.getters['meetStore/isHeatDirty'] (this.heatIdx)},
+        heatDirty:     function() { return this.heat.dirty || this.$store.getters['meet/heatUpdated'] (this.heat)},
         hasNextHeat:   function() { return this.heatIdx < (this.heats.length - 1) },
         hasPrevHeat:   function() { return this.heatIdx > 0 },
         numberOfHeats: function() { return  this.heats.length },
@@ -117,8 +119,10 @@ export default {
                     }
                 })
         },
-        refresh() {
+        async refresh() {
             console.log('refresh clicked')
+            this.$store.dispatch('meet/updateHeat', {heat: this.heat})
+                .then( (newHeat) => {this.heat = newHeat})
         }
     },
     created() {

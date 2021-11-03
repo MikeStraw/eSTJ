@@ -204,8 +204,10 @@ module.exports = {
         const conditions = {meet_id: queryObj.meetId, session_num: queryObj.session, number: queryObj.event}
         const event      = await Event.findOne(conditions)
         const eventId    = event._id
-        const heats      = extractHeatsFromEvent(eventJson)  // array of heat objects suitable for DB
 
+        // make a copy of the eventJson, so that extractHeatsFromEvent does not modify the original
+        const events = JSON.parse(JSON.stringify(eventJson) )
+        const heats = extractHeatsFromEvent(events)
         for (const heat of heats) {
             heat.event_id = eventId
             await saveHeatData(heat)
@@ -225,7 +227,7 @@ module.exports = {
 
         // Remove the entry.heat property which is found in the JSON but not in the DB.
         // Make a copy of newEntries so that we don't overwrite data in the original.
-        const entries = newEntries.slice()
+        const entries = JSON.parse(JSON.stringify(newEntries))
         for(let entry of entries) {
             delete entry.heat
         }

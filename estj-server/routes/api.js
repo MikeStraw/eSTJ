@@ -65,6 +65,20 @@ router.get('/api/event/:eventId/heats', async (ctx) => {
     }
 })
 
+router.get('/api/heat/:heatId', async(ctx) => {
+    const heatId = ctx.params.heatId
+    debug(`/api/heat/:heatId called with heatID=${heatId}`)
+
+    if (! heatId) {
+        debug('apiRouter.getHeat: No heat-id ...')
+        ctx.status = 400
+        ctx.body= { message: 'Required parameter heatId missing.' }
+    }
+    else {
+        ctx.body = await Heat.findOne({'_id': heatId})
+    }
+})
+
 router.get('/api/meets', async (ctx) => {
     ctx.body = await Meet.find( {} )
 })

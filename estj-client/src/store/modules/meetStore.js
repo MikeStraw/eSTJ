@@ -1,5 +1,29 @@
 import apiSvc from '../../services/api'
 import cacheSvc from '../../services/cache'
+import sseClient from '../../services/sseClient'
+
+
+/**
+ * Handles a meet update sent via SSE.  The update contains an object of the form
+ * {meetId:, session:, event:, heat:}, where the meetId is the Mongo meet ID,  session is the session number,
+ * event is the event number and heat is the heat number.
+ * @param {Object} updateItem
+ */
+function onSseUpdate(updateItem) {
+    console.log(`meetStore::onSeeUpdate -> event=${updateItem.event}, heat=${updateItem.heat}`)
+    if (updateItem.heat) {
+        console.log('marking heat dirty')
+        cacheSvc.markHeatDirty(updateItem.meetId, updateItem.session, updateItem.event, updateItem.heat)
+        state.heatUpdate = updateItem.heat
+    }
+    else if (updateItem.event) {
+        console.log('removing heat')
+        cacheSvc.removeHeats(updateItem.meetId, updateItem.session, updateItem.event)
+    }
+}
+
+const sseEmitter = sseClient.getSseEventEmitter()
+sseEmitter.on('dataUpdate', onSseUpdate)
 
 function commitError(commit, error) {
     if (error && error.response && error.response.data && error.response.data.error) {
@@ -29,10 +53,15 @@ const findSessionByNumber = (sessions, sessNum) => {
     return  sessions.find( (session) => session.number === Number(sessNum))
 }
 
+const isHeatBeingViewed = (state, heat) => {
+    return (state.activeEvent && state.activeEvent._id === heat.event_id && state.heatUpdate == heat.number)
+}
+
 
 const state = {
     activeEvent: false, // reference to the selected/viewed event
     activeMeet: false,  // copy of the selected meet & session
+    heatUpdate: 0,      // heat number of a just updated heat
     loading: false,     // true when retrieving meets from DB
     loadingError: ''    // contains data retrieval error message
 }
@@ -44,10 +73,14 @@ const getters = {
         else
             return false
     },
-    hasPrevEvent: state => { return state.activeMeet ? state.activeMeet.eventIdx > 0 : false }
+    hasPrevEvent: state => { return state.activeMeet ? state.activeMeet.eventIdx > 0 : false },
+    heatUpdated: (state) => (heat) => {return (isHeatBeingViewed(state, heat))}
 }
 
 const mutations = {
+    clearHeatUpdate(state) {
+        state.heatUpdate = 0
+    },
     dataRequested(state) {
         state.loading = true
         state.loadingError = ''
@@ -67,10 +100,14 @@ const mutations = {
                 state.activeEvent = activeMeet.events[idx]
             }
             activeMeet.eventIdx = idx
+            state.heatUpdate = 0
         }
     },
     setActiveMeet(state, meet) {
         state.activeMeet = meet
+    },
+    setHeatUpdate(state, heatNum) {
+        state.heatUpdate = heatNum
     }
 }
 
@@ -209,6 +246,28 @@ const actions = {
 
         commit('dataRequestFinished')
         return Promise.resolve(meets)
+    },
+    async updateHeat( {commit}, payload ) {
+        commit('dataRequested')
+
+        let   heat = {}
+        const heatId = payload.heat._id
+        try {
+            const response = await apiSvc.getHeat(heatId)
+            heat = response.data
+            console.log('/api/heat/:id returns', heat)
+
+            cacheSvc.updateHeatEntries(heat)
+            if (isHeatBeingViewed(state, heat)) {
+                commit('clearHeatUpdate')
+            }
+        }
+        catch (error) {
+            commitError(commit, error)
+        }
+
+        commit('dataRequestFinished')
+        return Promise.resolve(heat)
     }
 }
 

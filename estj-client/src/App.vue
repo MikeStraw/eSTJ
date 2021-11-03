@@ -2,11 +2,11 @@
     <v-app class="indigo lighten-5">>
         <stj-header></stj-header>
 
-        <v-content>
+        <v-main>
             <transition name="fade" mode="out-in" >
                 <router-view></router-view>
             </transition>
-        </v-content>
+        </v-main>
     </v-app>
 </template>
 

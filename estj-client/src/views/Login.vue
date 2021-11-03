@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import sseClient from '@/services/sseClient'
 import {mapState} from 'vuex'
 
 export default {
@@ -70,6 +71,7 @@ export default {
             console.log('login method called.')
             try {
                 await this.$store.dispatch('auth/login', this.form)
+                          .then( () => sseClient.connectToStream())
                 await this.$router.push( {name: 'meets'} )
             }
             catch (err) {

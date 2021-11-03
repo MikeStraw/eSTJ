@@ -67,6 +67,11 @@ const ApiService = {
         return axios.get(getUrl(path, true))
     },
 
+    getHeat: (heatId) => {
+        const path = `heat/${heatId}`
+        return axios.get(getUrl(path, true))
+    },
+
     getHeats: (eventId) => {
         const path = `event/${eventId}/heats`
         return axios.get(getUrl(path, true))

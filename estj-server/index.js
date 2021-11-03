@@ -6,6 +6,7 @@ const fs         = require('fs')
 const meetDbo    = require('./services/SwimMeetDbo')
 const meetUpdate = require('./services/fileUpdate')
 const mongoose   = require('mongoose')
+const sse        = require('./services/sse')
 
 const meetIdMap = new Map()   // Maps meet name + date --> meet ID
 
@@ -99,7 +100,7 @@ async function handleMeetUpdate(meetJsonFile, curJson) {
 
     const newJson = JSON.parse(fs.readFileSync(meetJsonFile, 'utf8'))
     const updateResult = meetUpdate.diffUpdate(curJson, newJson)
-    debug(updateResult)
+    //debug(updateResult)
 
     if (updateResult.updateSupported === false) {
         debug.error('Unsupported update ... HELP!')
@@ -129,6 +130,11 @@ async function handleMeetUpdate(meetJsonFile, curJson) {
                 const newEvent = meetUpdate.getEvent(newJson, updateItem)
                 await meetDbo.updateEventEntries(newEvent, updateItem)
             }
+
+            // inform clients of update
+            const clientUpdate = {event: 'dataUpdate', data: {meetId: meetId, session: updateItem.session,
+                event: updateItem.event, heat: updateItem.heat} }
+            sse.sendAll(clientUpdate)
         }
     }
     return newJson

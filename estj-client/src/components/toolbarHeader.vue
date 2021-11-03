@@ -37,6 +37,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import sseClient from '../services/sseClient'
 
 export default {
     name: 'toolbarHeader',
@@ -52,6 +53,7 @@ export default {
             console.log('stjHeader ... logout called.')
             this.$store.dispatch('auth/logout')
                 .then( () => {
+                    sseClient.closeStream()
                     this.$router.push( {name: 'login'} )
                 })
         },

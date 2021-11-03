@@ -5,6 +5,7 @@ const logger      = require('koa-logger')
 const Koa         = require('koa')
 const routesApi   = require('./routes/api')
 const routesLogin = require('./routes/login')
+const sseRoute    = require('./routes/sse')
 const staticPath  = require('koa-static')
 
 const app = new Koa()
@@ -29,6 +30,7 @@ app.use(async (ctx, next) => {
 app.use(staticPath('./public'))  // serve estj-client built index.html from /public
 app.use(routesLogin.routes()).use(routesLogin.allowedMethods())
 app.use(routesApi.routes()).use(routesApi.allowedMethods())
+app.use(sseRoute.routes()).use(sseRoute.allowedMethods())
 
 function normalizePort(val) {
     const port = parseInt(val, 10)

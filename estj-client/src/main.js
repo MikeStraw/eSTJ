@@ -2,6 +2,7 @@ import App from './App.vue'
 import apiSvc from './services/api'
 import tokenSvc from './services/token'
 import router from './router'
+import sseClient from './services/sseClient'
 import store from './store'
 import Vue from 'vue'
 
@@ -25,6 +26,7 @@ new Vue({
                 apiSvc.addAuthHeader(token)
                 this.$store.dispatch('auth/setUser', user).then( () => {
                     console.log('Auto-Login: successful Login')
+                    sseClient.connectToStream()
                 })
             }
             else {
@@ -33,6 +35,9 @@ new Vue({
                 })
             }
         }
+    },
+    beforeDestroy() {
+        sseClient.closeStream()
     },
     vuetify,
     render: h => h(App)
