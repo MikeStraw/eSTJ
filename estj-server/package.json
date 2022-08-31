@@ -17,7 +17,7 @@
     "koa2-cors": "^2.0.6",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
-    "moment-timezone": "^0.5.33",
+    "moment-timezone": "^0.5.35",
     "mongoose": "^5.13.12"
   },
   "devDependencies": {
